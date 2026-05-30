@@ -1,5 +1,6 @@
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
+import BuildingShowcase from "./components/BuildingShowcase";
 import About from "./components/About";
 import FeaturedWork from "./components/FeaturedWork";
 import Products from "./components/Products";
@@ -13,6 +14,7 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
+        <BuildingShowcase />
         <About />
         <FeaturedWork />
         <Products />
