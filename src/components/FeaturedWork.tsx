@@ -1,5 +1,5 @@
 import Reveal from "./motion/Reveal";
-import TiltCard from "./motion/TiltCard";
+import Weighted from "./motion/Weighted";
 
 type Project = {
   title: string;
@@ -18,7 +18,7 @@ const projects: Project[] = [
     tags: ["Python", "FastAPI", "HTMX", "Tailwind"],
     href: "/fleetcast",
     status: "Live",
-    accent: "from-orange-500/30 via-orange-500/10 to-transparent",
+    accent: "from-purple-500/30 via-purple-500/10 to-transparent",
   },
   {
     title: "FactVault",
@@ -61,7 +61,7 @@ export default function FeaturedWork() {
         >
           {projects.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.08}>
-              <TiltCard className="h-full">
+              <Weighted tilt={5} lift={10} className="h-full">
                 <article
                   className={`group relative bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 rounded-xl p-6 transition-colors h-full overflow-hidden`}
                 >
@@ -95,7 +95,7 @@ export default function FeaturedWork() {
                     )}
                   </div>
                 </article>
-              </TiltCard>
+              </Weighted>
             </Reveal>
           ))}
         </div>

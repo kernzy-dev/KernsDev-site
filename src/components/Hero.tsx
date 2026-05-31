@@ -1,15 +1,19 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import useReducedMotion from "../hooks/useReducedMotion";
+import Magnetic from "./motion/Magnetic";
 
 export default function Hero() {
+  const reduced = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const textY = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const meshScale = useTransform(scrollYProgress, [0, 1], [1, 1.4]);
+  // Disable parallax + mesh scale when reduced-motion is set.
+  const textY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, 120]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.8], reduced ? [1, 1] : [1, 0]);
+  const meshScale = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [1, 1.4]);
 
   return (
     <section
@@ -22,33 +26,31 @@ export default function Hero() {
         style={{ scale: meshScale }}
         className="pointer-events-none absolute inset-0 -z-10"
       >
-        {/* Mesh blob 1 */}
+        {/* Mesh blob 1 — animated drift, disabled when reduced-motion is on */}
         <motion.div
-          animate={{
+          animate={reduced ? undefined : {
             x: [0, 60, -40, 0],
             y: [0, -30, 40, 0],
             scale: [1, 1.1, 0.95, 1],
           }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          transition={reduced ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[10%] left-[25%] w-[40rem] h-[40rem] bg-accent/20 blur-3xl rounded-full"
         />
-        {/* Mesh blob 2 */}
         <motion.div
-          animate={{
+          animate={reduced ? undefined : {
             x: [0, -50, 30, 0],
             y: [0, 50, -20, 0],
             scale: [1, 0.9, 1.15, 1],
           }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[15%] w-[36rem] h-[36rem] bg-orange-700/20 blur-3xl rounded-full"
+          transition={reduced ? undefined : { duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] right-[15%] w-[36rem] h-[36rem] bg-fuchsia-700/20 blur-3xl rounded-full"
         />
-        {/* Mesh blob 3 — cooler color for contrast */}
         <motion.div
-          animate={{
+          animate={reduced ? undefined : {
             x: [0, 40, -30, 0],
             y: [0, -50, 30, 0],
           }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+          transition={reduced ? undefined : { duration: 26, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-[5%] left-[10%] w-[32rem] h-[32rem] bg-violet-700/15 blur-3xl rounded-full"
         />
         {/* Subtle grid overlay */}
@@ -100,22 +102,16 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="flex flex-wrap justify-center gap-3"
           >
-            <motion.a
-              href="#contact"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="btn-primary"
-            >
-              Book a call →
-            </motion.a>
-            <motion.a
-              href="#work"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="btn-ghost"
-            >
-              See the work
-            </motion.a>
+            <Magnetic radius={90} strength={0.28}>
+              <a href="#contact" className="btn-primary">
+                Book a call →
+              </a>
+            </Magnetic>
+            <Magnetic radius={90} strength={0.28}>
+              <a href="#running" className="btn-ghost">
+                See what's running
+              </a>
+            </Magnetic>
           </motion.div>
         </motion.div>
 
@@ -149,11 +145,13 @@ export default function Hero() {
           ))}
         </motion.div>
 
-        {/* Subtle scroll cue */}
+        {/* Subtle scroll cue — bouncing arrow, static when reduced-motion */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, y: [0, 8, 0] }}
-          transition={{ opacity: { delay: 1.5, duration: 0.8 }, y: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1.5 } }}
+          animate={reduced ? { opacity: 1 } : { opacity: 1, y: [0, 8, 0] }}
+          transition={reduced
+            ? { opacity: { delay: 1.5, duration: 0.8 } }
+            : { opacity: { delay: 1.5, duration: 0.8 }, y: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1.5 } }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 text-neutral-500 text-xs tracking-wider"
         >
           ↓ scroll

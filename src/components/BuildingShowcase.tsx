@@ -2,6 +2,7 @@ import { Suspense, useState, useEffect, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Reveal from "./motion/Reveal";
 import ThreeErrorBoundary from "./three/ThreeErrorBoundary";
+import LoadingScreen from "./three/LoadingScreen";
 import type { BuildingPart } from "./three/Building";
 
 // Lazy-load THE ENTIRE 3D scene module (which itself imports R3F + Three).
@@ -30,16 +31,18 @@ const VALUES: Record<Exclude<BuildingPart, null>, { title: string; subtitle: str
 };
 
 function hasWebGL(): boolean {
-  try {
-    const canvas = document.createElement("canvas");
-    const ctx =
-      canvas.getContext("webgl2") ||
-      canvas.getContext("webgl") ||
-      (canvas.getContext as any)("experimental-webgl");
-    return !!ctx;
-  } catch {
-    return false;
-  }
+  // Each getContext attempt needs a FRESH canvas — once a canvas has had a
+  // context requested (even unsuccessfully), subsequent getContext calls of
+  // a different type on the same canvas return null.
+  const tryType = (type: "webgl2" | "webgl" | "experimental-webgl"): boolean => {
+    try {
+      const canvas = document.createElement("canvas");
+      return !!canvas.getContext(type as any);
+    } catch {
+      return false;
+    }
+  };
+  return tryType("webgl2") || tryType("webgl") || tryType("experimental-webgl");
 }
 
 function StaticFallback({ active }: { active: BuildingPart }) {
@@ -87,20 +90,18 @@ export default function BuildingShowcase() {
           </div>
         </Reveal>
 
-        <div className="relative rounded-2xl overflow-hidden border border-neutral-800 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 h-[520px] md:h-[640px]">
+        <div
+          role="img"
+          aria-label="Interactive 3D scene of a Georgian mansion. Each architectural part represents a value I bring to the work: the foundation is honest, the walls are fast, the roof is detail-oriented."
+          className="relative rounded-2xl overflow-hidden border border-neutral-800 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 h-[520px] md:h-[640px]"
+        >
           {webglOk === false ? (
             <StaticFallback active={active} />
           ) : webglOk === null ? (
-            <div className="absolute inset-0 grid place-items-center text-neutral-500 text-sm">
-              Loading the scene…
-            </div>
+            <LoadingScreen />
           ) : (
             <ThreeErrorBoundary fallback={<StaticFallback active={active} />}>
-              <Suspense fallback={
-                <div className="absolute inset-0 grid place-items-center text-neutral-500 text-sm">
-                  Loading the scene…
-                </div>
-              }>
+              <Suspense fallback={<LoadingScreen />}>
                 <Scene active={active} setActive={setActive} />
               </Suspense>
             </ThreeErrorBoundary>
@@ -134,18 +135,33 @@ export default function BuildingShowcase() {
             </div>
           )}
 
-          <div className="absolute top-4 right-4 flex gap-2 text-[10px] uppercase tracking-wider pointer-events-none">
+          {/* Legend badges — also act as keyboard / touch entry points.
+              Focusing or clicking one triggers the same active-state highlight as
+              hovering the corresponding 3D part. */}
+          <div
+            role="group"
+            aria-label="Select a value to learn about"
+            className="absolute top-4 right-4 flex gap-2 text-[10px] uppercase tracking-wider"
+          >
             {(["foundation", "walls", "roof"] as const).map((part) => (
-              <div
+              <button
                 key={part}
-                className={`px-2 py-1 rounded border transition-colors ${
+                type="button"
+                onMouseEnter={() => setActive(part)}
+                onFocus={() => setActive(part)}
+                onMouseLeave={() => setActive(null)}
+                onBlur={() => setActive(null)}
+                onClick={() => setActive(active === part ? null : part)}
+                aria-pressed={active === part}
+                aria-label={`${VALUES[part].title} — ${VALUES[part].subtitle}`}
+                className={`px-2 py-1 rounded border transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 ${
                   active === part
                     ? "bg-accent text-white border-accent"
-                    : "bg-neutral-900/60 text-neutral-500 border-neutral-800"
+                    : "bg-neutral-900/60 text-neutral-500 border-neutral-800 hover:text-neutral-300"
                 }`}
               >
                 {VALUES[part].title}
-              </div>
+              </button>
             ))}
           </div>
         </div>

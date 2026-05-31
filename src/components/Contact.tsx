@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
 import Reveal from "./motion/Reveal";
 
-// TODO: replace BOOKING_URL with your Cal.com or Calendly link once set up.
-const BOOKING_URL = "mailto:grant.kerns14@gmail.com?subject=KernsDev%20—%20want%20to%20book%20a%20call";
-const EMAIL = "grant.kerns14@gmail.com";
+// TODO: replace BOOKING_URL with your Cal.com / Calendly link when ready.
+// TODO: when the branded email is live, swap CONTACT_EMAIL back in and re-enable the email button.
+const BOOKING_URL = "#";  // disabled until set up
+const CONTACT_EMAIL: string | null = null;  // intentionally hidden — branded email coming soon
 
 export default function Contact() {
   return (
@@ -39,22 +40,30 @@ export default function Contact() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="btn-primary text-base"
+              onClick={(e) => {
+                if (BOOKING_URL === "#") {
+                  e.preventDefault();
+                  alert("Booking link is being set up — check back soon.");
+                }
+              }}
             >
               Book a call →
             </motion.a>
-            <motion.a
-              href={`mailto:${EMAIL}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="btn-ghost text-base"
-            >
-              {EMAIL}
-            </motion.a>
+            {CONTACT_EMAIL && (
+              <motion.a
+                href={`mailto:${CONTACT_EMAIL}`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-ghost text-base"
+              >
+                {CONTACT_EMAIL}
+              </motion.a>
+            )}
           </div>
         </Reveal>
         <Reveal delay={0.4}>
           <p className="text-xs text-neutral-600 mt-8">
-            Based in Somerset, KY · Remote-friendly · Reply within 24h
+            Based in Somerset, KY · Remote-friendly · Booking + email channels coming soon
           </p>
         </Reveal>
       </div>

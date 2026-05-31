@@ -43,7 +43,7 @@ src/
 ## Things to edit by hand (search for TODO)
 
 - `src/components/Contact.tsx` → `BOOKING_URL` constant — wire your Cal.com / Calendly link once set up
-- Email address → currently `grant.kerns14@gmail.com`; swap when branded email is live
+- `src/components/Contact.tsx` → `CONTACT_EMAIL` constant — currently `null` (button hidden); set to your branded email once it's live
 - Add real screenshots for the Fleetcast and FactVault project cards (drop into `public/` and reference)
 - `index.html` meta tags — verify OG description matches latest positioning
 

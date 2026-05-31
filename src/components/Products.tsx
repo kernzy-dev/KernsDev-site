@@ -1,5 +1,5 @@
 import Reveal from "./motion/Reveal";
-import TiltCard from "./motion/TiltCard";
+import Weighted from "./motion/Weighted";
 
 type Product = {
   name: string;
@@ -58,7 +58,7 @@ export default function Products() {
         >
           {products.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.1}>
-              <TiltCard intensity={5} className="h-full">
+              <Weighted tilt={4} lift={14} className="h-full">
                 <article className="group relative bg-gradient-to-br from-neutral-900/60 to-neutral-900/20 border border-neutral-800 hover:border-accent/40 rounded-2xl overflow-hidden transition-colors h-full">
                   {/* Hero image — 3D floating effect */}
                   {p.image && (
@@ -68,8 +68,11 @@ export default function Products() {
                         src={p.image}
                         alt={`${p.name} screenshot`}
                         loading="lazy"
-                        className="absolute inset-x-4 top-6 w-[calc(100%-2rem)] rounded-md shadow-2xl shadow-black/60 ring-1 ring-neutral-700/50 transition-transform duration-700 group-hover:scale-[1.04]"
-                        style={{ transform: "translateZ(40px)" }}
+                        decoding="async"
+                        width="1280"
+                        height="900"
+                        className="absolute inset-x-4 top-6 w-[calc(100%-2rem)] h-auto rounded-md shadow-2xl shadow-black/60 ring-1 ring-neutral-700/50 transition-transform duration-700 group-hover:scale-[1.04]"
+                        style={{ transform: "translateZ(40px)", aspectRatio: "1280/900" }}
                       />
                     </div>
                   )}
@@ -93,7 +96,7 @@ export default function Products() {
                     </a>
                   </div>
                 </article>
-              </TiltCard>
+              </Weighted>
             </Reveal>
           ))}
 

@@ -6,6 +6,12 @@
   html {
     scroll-behavior: smooth;
   }
+  /* Respect prefers-reduced-motion at the CSS layer too (anchor scroll). */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
   body {
     @apply bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-accent/30;
   }
