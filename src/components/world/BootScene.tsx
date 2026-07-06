@@ -63,10 +63,22 @@ export default function BootScene({ onDone }: Props) {
   // Already booted this session, or reduced-motion → skip.
   useEffect(() => {
     let already = false;
+    // `?forceboot=1` (or ?forceboot) bypasses the sessionStorage-skip so
+    // Grant / anyone reviewing can replay the boot without opening a new
+    // incognito tab. Matches the ?skipintro=1 / ?debug=1 URL-flag pattern.
+    let forced = false;
     try {
-      already = sessionStorage.getItem(BOOT_SESSION_FLAG) === "1";
+      const p = new URLSearchParams(window.location.search);
+      forced = p.get("forceboot") === "1" || p.has("forceboot");
     } catch {
       /* ignore */
+    }
+    if (!forced) {
+      try {
+        already = sessionStorage.getItem(BOOT_SESSION_FLAG) === "1";
+      } catch {
+        /* ignore */
+      }
     }
     if (already || reduced) {
       doneRef.current = true;
