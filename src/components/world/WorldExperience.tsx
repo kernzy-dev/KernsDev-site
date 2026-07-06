@@ -4,8 +4,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ThreeErrorBoundary from "../three/ThreeErrorBoundary";
 import LoadingScreen from "../three/LoadingScreen";
-import BootScene from "./BootScene";
-import MatrixWarp from "./MatrixWarp";
+import PixelFall from "./PixelFall";
 import useReducedMotion from "../../hooks/useReducedMotion";
 import Fallback2D from "./Fallback2D";
 import WorldHUD from "./WorldHUD";
@@ -17,15 +16,22 @@ gsap.registerPlugin(ScrollTrigger);
 const CaveScene = lazy(() => import("./CaveScene"));
 
 /**
- * Phase state machine (R28):
- *   'boot' → BootSequence terminal overlay (R26; R29 will replace with a
- *            3D bash/terminal loader inside the Canvas)
- *   'warp' → MatrixWarp overlay (R28 placeholder; R29 will render Matrix
- *            glyph rain → hyperspace tunnel)
- *   'cave' → CaveScene visible (R28 interim = NOCTURNE contents; R31
- *            rebuilds as the immersive cave interior)
+ * R32 — Vertical tunnel descent.
+ *
+ * The visitor scrolls straight down through Grant's world. The art
+ * style morphs as they descend:
+ *   0.00 - 0.35   PIXEL FALL — 2D pixel-art sprites (Grant's projects)
+ *                 tumble in from above; layer fades on scroll.
+ *   0.35 - 0.75   CAVERN — living 3D cavern (drawn under the pixel
+ *                 layer from the start so the 2D→3D crossfade is a
+ *                 pure alpha morph, not a hard cut).
+ *   0.75 - 1.00   DUNGEON — deeper stage; palette/lighting shift, real
+ *                 projects laid out as spatial "loot". (R33+ — currently
+ *                 the cavern continues to the bottom of the scroll rail.)
+ *
+ * No phase state machine — everything is a function of the shared
+ * `scrollProgress` ref/state written by ScrollTrigger.
  */
-type Phase = "boot" | "warp" | "cave";
 
 /**
  * Top-level of the NOCTURNE /world experience.
@@ -53,12 +59,12 @@ export default function WorldExperience() {
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("skipintro") === "1",
   );
-  // R28: 3-phase state machine boot → warp → cave. `skipIntro` jumps
-  // straight to cave (capture/debug). ScrollCamera's `intro` freeze
-  // stays on until we hit 'cave' so the camera doesn't wander while
-  // the boot text or warp is playing.
-  const [phase, setPhase] = useState<Phase>(skipIntro ? "cave" : "boot");
-  const intro = phase !== "cave";
+  // R32: no phase state machine — scroll drives everything. Keeping
+  // `intro` as a name for the "camera locked until user has scrolled a
+  // hair" idea, but it's now just derived from scroll position (with
+  // ?skipintro=1 forcing false).
+  const intro = false;
+  void skipIntro; // reserved for future — currently harmless.
   const [scrollProgress, setScrollProgress] = useState(0);
   const progressRef = useRef(0);
   const scrollRoot = useRef<HTMLDivElement>(null);
@@ -181,17 +187,10 @@ export default function WorldExperience() {
         )}
       </div>
 
-      {/* R30 phase: boot → warp → cave. BootScene is a 3D CRT terminal
-          inside its own R3F Canvas (replaces R26's 2D DOM overlay).
-          MatrixWarp is R29's 2D-canvas Matrix rain → hyperspace visual.
-          Both sit on top of the fixed CaveScene canvas so it can load
-          under them — the "opens black" fix is preserved. */}
-      {phase === "boot" && (
-        <BootScene onDone={() => setPhase("warp")} />
-      )}
-      {phase === "warp" && (
-        <MatrixWarp onDone={() => setPhase("cave")} />
-      )}
+      {/* R32: PixelFall — 2D pixel-art fall-in. Renders from t=0, fades
+          on scroll progress. The 3D CaveScene renders under it so the
+          2D→3D crossfade is a pure alpha morph. */}
+      <PixelFall scrollProgress={scrollProgress} />
 
       {/* Legacy curtain kept as an invisible passthrough (IntroCurtain in
           WorldScene still writes to it via ref — one-liner keeps that
