@@ -10,6 +10,7 @@ import useReducedMotion from "../../hooks/useReducedMotion";
 import Fallback2D from "./Fallback2D";
 import WorldHUD from "./WorldHUD";
 import { PALETTE } from "./worldData";
+import { hasWebGL } from "../../lib/webgl";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,18 +26,6 @@ const CaveScene = lazy(() => import("./CaveScene"));
  *            rebuilds as the immersive cave interior)
  */
 type Phase = "boot" | "warp" | "cave";
-
-function hasWebGL(): boolean {
-  const tryType = (type: "webgl2" | "webgl" | "experimental-webgl"): boolean => {
-    try {
-      const canvas = document.createElement("canvas");
-      return !!canvas.getContext(type as unknown as "webgl2");
-    } catch {
-      return false;
-    }
-  };
-  return tryType("webgl2") || tryType("webgl") || tryType("experimental-webgl");
-}
 
 /**
  * Top-level of the NOCTURNE /world experience.

@@ -4,6 +4,7 @@ import Reveal from "./motion/Reveal";
 import ThreeErrorBoundary from "./three/ThreeErrorBoundary";
 import LoadingScreen from "./three/LoadingScreen";
 import type { BuildingPart } from "./three/Building";
+import { hasWebGL } from "../lib/webgl";
 
 // Lazy-load THE ENTIRE 3D scene module (which itself imports R3F + Three).
 // Headless / no-WebGL browsers never download this chunk.
@@ -29,21 +30,6 @@ const VALUES: Record<Exclude<BuildingPart, null>, { title: string; subtitle: str
       "The visual polish, the empty-state copy, the keyboard shortcut nobody asked for. The thing visitors notice but can't name — that's where trust gets built.",
   },
 };
-
-function hasWebGL(): boolean {
-  // Each getContext attempt needs a FRESH canvas — once a canvas has had a
-  // context requested (even unsuccessfully), subsequent getContext calls of
-  // a different type on the same canvas return null.
-  const tryType = (type: "webgl2" | "webgl" | "experimental-webgl"): boolean => {
-    try {
-      const canvas = document.createElement("canvas");
-      return !!canvas.getContext(type as any);
-    } catch {
-      return false;
-    }
-  };
-  return tryType("webgl2") || tryType("webgl") || tryType("experimental-webgl");
-}
 
 function StaticFallback({ active }: { active: BuildingPart }) {
   return (
