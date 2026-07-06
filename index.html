@@ -27,22 +27,40 @@
     <link rel="preconnect" href="https://dl.polyhaven.org" crossorigin />
     <link rel="dns-prefetch" href="https://dl.polyhaven.org" />
 
-    <!-- Preload the 3D scene's heaviest assets so they parallelize with JS download.
-         These are the same URLs used in Scene.tsx (HDR) and PBRMaterials.tsx (textures).
-         CRITICAL: keep these in sync with the URLs in the components — or browsers refetch. -->
-    <link rel="preload" as="fetch" type="image/vnd.radiance" crossorigin
-          href="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_43d_clear_puresky_1k.hdr" />
-    <link rel="preload" as="image" crossorigin
-          href="https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/castle_brick_07/castle_brick_07_diff_2k.jpg" />
-    <link rel="preload" as="image" crossorigin
-          href="https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/forrest_ground_01/forrest_ground_01_diff_2k.jpg" />
-    <link rel="preload" as="image" crossorigin
-          href="https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/asphalt_02/asphalt_02_diff_2k.jpg" />
-    <link rel="preload" as="image" crossorigin
-          href="https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/roof_09/roof_09_diff_2k.jpg" />
+    <!-- Route-conditional 3D asset preloading. The root site (`/`) uses the
+         daytime mansion; `/world` uses the NOCTURNE night scene — different
+         HDRIs and completely different textures. Statically preloading both
+         would waste ~13 MB on /world visitors and ~1.7 MB on root visitors.
+         This inline script runs during HTML parse, injects only the relevant
+         hints, and keeps the URLs paired with their consumers in code:
+           * root  ← Scene.tsx (HDR) + PBRMaterials.tsx (4 textures)
+           * /world ← WorldScene.tsx (HDR only)
+         CRITICAL: keep these URLs in sync with those components — mismatch
+         causes a re-fetch and negates the preload. -->
+    <script>
+      (function () {
+        var base = 'https://dl.polyhaven.org/file/ph-assets/';
+        var mk = function (href, as, type) {
+          var l = document.createElement('link');
+          l.rel = 'preload';
+          l.as = as;
+          l.crossOrigin = 'anonymous';
+          if (type) l.type = type;
+          l.href = href;
+          document.head.appendChild(l);
+        };
+        if (location.pathname === '/world') {
+          mk(base + 'HDRIs/hdr/1k/dikhololo_night_1k.hdr', 'fetch', 'image/vnd.radiance');
+        } else {
+          mk(base + 'HDRIs/hdr/1k/kloofendal_43d_clear_puresky_1k.hdr', 'fetch', 'image/vnd.radiance');
+          mk(base + 'Textures/jpg/2k/castle_brick_07/castle_brick_07_diff_2k.jpg', 'image');
+          mk(base + 'Textures/jpg/2k/forrest_ground_01/forrest_ground_01_diff_2k.jpg', 'image');
+          mk(base + 'Textures/jpg/2k/asphalt_02/asphalt_02_diff_2k.jpg', 'image');
+          mk(base + 'Textures/jpg/2k/roof_09/roof_09_diff_2k.jpg', 'image');
+        }
+      })();
+    </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
     <title>KernsDev — I build software.</title>
@@ -87,6 +105,34 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- R31: pre-hydration terminal stub so /world visitors never see raw
+         black between HTML parse and Canvas init. Sits as a fixed overlay
+         ABOVE #root (z=200) so React mounting and R3F Canvas init both
+         happen underneath it. BootScene sets sessionStorage['pre-boot-hide']
+         after its first render, which triggers the removal script (also
+         a 4s hard timeout as a safety-net so we never leave a dev-only
+         hang on-screen). Only mounts on /world. -->
+    <div id="pre-boot" style="position:fixed;inset:0;background:#03050a;color:#e8ecf4;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;display:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:80px 32px;z-index:200;transition:opacity 0.3s ease-out;pointer-events:none;"><div style="color:#6b7280;font-size:11px;margin-bottom:12px;">kernsdev.com — connecting</div><div><span style="color:#35E7E0;">grant@kernsdev</span><span style="color:#6b7280;"> ~ $ </span><span style="display:inline-block;width:0.55em;height:1.05em;background:#e8ecf4;vertical-align:-2px;animation:preBootBlink 1s steps(2,start) infinite;"></span></div></div>
+    <style>@keyframes preBootBlink{0%,49%{opacity:1;}50%,100%{opacity:0;}}</style>
+    <script>
+      (function () {
+        if (location.pathname !== '/world') return;
+        var el = document.getElementById('pre-boot');
+        if (!el) return;
+        el.style.display = 'flex';
+        var removed = false;
+        var remove = function () {
+          if (removed) return;
+          removed = true;
+          el.style.opacity = '0';
+          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+        };
+        // BootScene signals ready via this global (set once its first frame paints).
+        window.__preBootHide = remove;
+        // Safety-net: never leave the stub up past 4s.
+        setTimeout(remove, 4000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

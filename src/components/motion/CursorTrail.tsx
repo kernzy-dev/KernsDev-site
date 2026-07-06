@@ -22,17 +22,12 @@ export default function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const points = useRef<Point[]>([]);
   const lastDraw = useRef(0);
-  const enabled = useRef(true);
 
   useEffect(() => {
     if (reduced) return;
 
     // Skip on touch-primary devices — no cursor to trail.
-    const isTouchPrimary = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouchPrimary) {
-      enabled.current = false;
-      return;
-    }
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useReducedMotion from "../../hooks/useReducedMotion";
 
 /**
@@ -27,15 +27,12 @@ type Props = {
 export default function ScrambleText({ text, speed = 26, delay = 0, className }: Props) {
   const reduced = useReducedMotion();
   const [out, setOut] = useState(() => (reduced ? text : ""));
-  const tickRef = useRef<number | null>(null);
-  const startedRef = useRef(false);
 
   useEffect(() => {
     if (reduced) {
       setOut(text);
       return;
     }
-    startedRef.current = false;
     setOut("");
     let settled = 0;
     let rolling = 0;
@@ -43,7 +40,6 @@ export default function ScrambleText({ text, speed = 26, delay = 0, className }:
     let last = performance.now();
 
     const begin = window.setTimeout(() => {
-      startedRef.current = true;
       const step = (now: number) => {
         if (now - last >= speed) {
           last = now;
@@ -68,7 +64,6 @@ export default function ScrambleText({ text, speed = 26, delay = 0, className }:
     return () => {
       window.clearTimeout(begin);
       if (raf) cancelAnimationFrame(raf);
-      if (tickRef.current) cancelAnimationFrame(tickRef.current);
     };
   }, [text, speed, delay, reduced]);
 

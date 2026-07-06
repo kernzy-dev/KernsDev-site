@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import BootSequence from "./components/BootSequence";
+import BuildingShowcase from "./components/BuildingShowcase";
 import StatusBlock from "./components/StatusBlock";
 import CursorTrail from "./components/motion/CursorTrail";
 
@@ -15,13 +16,31 @@ const Products = lazy(() => import("./components/Products"));
 const Services = lazy(() => import("./components/Services"));
 const Contact = lazy(() => import("./components/Contact"));
 const Footer = lazy(() => import("./components/Footer"));
+// /world prototype — explorable 3D dev-plaza. Gated behind a route so it
+// ships as its own chunk and doesn't touch the main landing page.
+const WorldExperience = lazy(() => import("./components/world/WorldExperience"));
 
 const SECTION_PLACEHOLDER = (
   <div className="py-20 md:py-28 min-h-[640px]" aria-hidden />
 );
 
+const WORLD_FALLBACK = <div className="fixed inset-0 bg-neutral-950" />;
+
 export default function App() {
+  // Stable across the component's lifetime — no router, so pathname doesn't
+  // change without a full reload. Captured once via useState initializer.
+  const [isWorld] = useState(
+    () => typeof window !== "undefined" && window.location.pathname === "/world",
+  );
   const [booted, setBooted] = useState(false);
+
+  if (isWorld) {
+    return (
+      <Suspense fallback={WORLD_FALLBACK}>
+        <WorldExperience />
+      </Suspense>
+    );
+  }
 
   return (
     <>
@@ -29,6 +48,7 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
+        <BuildingShowcase />
         <StatusBlock />
         <Suspense fallback={SECTION_PLACEHOLDER}>
           <About />

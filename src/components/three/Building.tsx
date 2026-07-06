@@ -1,4 +1,4 @@
-import { useRef, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useStonePBR, useRoofPBR } from "./PBRMaterials";
@@ -57,6 +57,16 @@ export default function Building({ active, setActive }: Props) {
     const t = state.clock.getElapsedTime();
     groupRef.current.rotation.y = Math.sin(t * 0.08) * 0.05;
   });
+
+  // Reset the body cursor if we unmount while a part was still hovered — otherwise
+  // pointerOut never fires (WebGL crash → error boundary swap, canvas scrolled
+  // off-screen without a mousemove, etc.) and the "pointer" cursor sticks
+  // globally for the rest of the page.
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = "auto";
+    };
+  }, []);
 
   const onOver =
     (part: Exclude<BuildingPart, null>) =>

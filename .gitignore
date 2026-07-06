@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Dev/preview screenshots (throwaway)
+/_*.png
+
 # Editor / OS
 .vscode/*
 !.vscode/extensions.json

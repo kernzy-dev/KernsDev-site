@@ -42,6 +42,9 @@ export default function StatusBlock() {
   useEffect(() => {
     const ctrl = new AbortController();
     loadStatus(Date.now(), ctrl.signal).then(({ bots, generatedAt }) => {
+      // Providers swallow AbortError internally, so loadStatus still resolves
+      // (with seed data) after abort — guard against setState after unmount.
+      if (ctrl.signal.aborted) return;
       setBots(bots);
       setGeneratedAt(generatedAt);
     });
