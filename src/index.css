@@ -30,14 +30,6 @@
   }
 }
 
-/* R30: caret blink for the 3D BootScene terminal (drei <Html> DOM content).
-   Framer-motion isn't wired inside <Html> reliably so a raw CSS keyframe
-   is the simpler primitive. */
-@keyframes boot-caret-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
 @layer components {
   .container-tight {
     @apply max-w-6xl mx-auto px-6;
