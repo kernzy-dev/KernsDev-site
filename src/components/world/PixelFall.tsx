@@ -57,31 +57,73 @@ const PROJECTS: Project[] = [
 ];
 
 type Sprite = {
-  projectIdx: number;
-  x: number;      // horizontal center, viewport px
-  y: number;      // vertical center, viewport px (can be negative for above-viewport)
-  vy: number;     // vertical velocity, px/ms
-  rot: number;    // rotation, radians
-  vrot: number;   // rotation velocity, rad/ms
-  size: number;   // tile side length, viewport px
-  hue: number;    // per-sprite palette offset (0-3)
+  tileIdx: number; // index into pre-rendered TILE_CACHE
+  x: number;       // horizontal center, viewport px
+  y: number;       // vertical center, viewport px (can be negative)
+  vy: number;      // vertical velocity, px/ms
+  rot: number;     // rotation, radians
+  vrot: number;    // rotation velocity, rad/ms
 };
 
+// R34 perf: 3 discrete sizes × 4 projects = 12 pre-rendered offscreen
+// bitmaps. drawImage per sprite instead of per-frame font-set + fillRect
+// + strokeRect + fillText — 5-10× cheaper on typical hardware. Previous
+// implementation set ctx.font every sprite every frame which forced
+// text-metric recompute (the real culprit behind "falling objects
+// lagging like crazy").
+const TILE_SIZES = [56, 72, 88];
 const SPRITE_COUNT = 14;
 
-function makeSprite(vpW: number, vpH: number, startAbove = true): Sprite {
-  const size = 48 + Math.floor(Math.random() * 40); // 48-88px
+function makeSprite(vpW: number, vpH: number, tileCount: number, startAbove: boolean): Sprite {
+  const size = TILE_SIZES[Math.floor(Math.random() * TILE_SIZES.length)];
   return {
-    projectIdx: Math.floor(Math.random() * PROJECTS.length),
+    tileIdx: Math.floor(Math.random() * tileCount),
     x: 40 + Math.random() * (vpW - 80),
-    // Distribute initial y across a range above viewport so first frame reads populated.
     y: startAbove ? -(size + Math.random() * vpH * 1.2) : Math.random() * vpH,
-    vy: 0.10 + Math.random() * 0.22, // 100-320 px/sec
+    vy: 0.10 + Math.random() * 0.22,
     rot: (Math.random() - 0.5) * 0.4,
-    vrot: (Math.random() - 0.5) * 0.0018, // rad/ms
-    size,
-    hue: Math.floor(Math.random() * PROJECTS.length),
+    vrot: (Math.random() - 0.5) * 0.0018,
   };
+}
+
+type Tile = { canvas: HTMLCanvasElement; halfW: number; halfH: number };
+
+function buildTileCache(): Tile[] {
+  const tiles: Tile[] = [];
+  for (let projectIdx = 0; projectIdx < PROJECTS.length; projectIdx++) {
+    const p = PROJECTS[projectIdx];
+    for (const size of TILE_SIZES) {
+      const off = document.createElement("canvas");
+      // Small padding so the shadow offset + border don't clip.
+      const pad = 6;
+      const w = size + pad * 2;
+      const h = size + pad * 2;
+      off.width = w;
+      off.height = h;
+      const c = off.getContext("2d");
+      if (!c) continue;
+      c.imageSmoothingEnabled = false;
+      c.translate(pad, pad);
+      // Shadow — offset dark rect behind
+      c.fillStyle = PALETTE.shadow;
+      c.fillRect(4, 4, size, size);
+      // Body
+      c.fillStyle = p.bg;
+      c.fillRect(0, 0, size, size);
+      // Border
+      c.strokeStyle = p.edge;
+      c.lineWidth = 2;
+      c.strokeRect(1, 1, size - 2, size - 2);
+      // Glyph
+      c.fillStyle = p.fg;
+      c.font = `bold ${Math.floor(size * 0.5)}px "JetBrains Mono", ui-monospace, monospace`;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.fillText(p.icon, size / 2, size / 2 + size * 0.03);
+      tiles.push({ canvas: off, halfW: w / 2, halfH: h / 2 });
+    }
+  }
+  return tiles;
 }
 
 export default function PixelFall({ scrollProgress }: Props) {
@@ -106,6 +148,8 @@ export default function PixelFall({ scrollProgress }: Props) {
 
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     let sprites: Sprite[] = [];
+    // Pre-render project tiles ONCE. No text rendering in the frame loop.
+    const tileCache = buildTileCache();
 
     const setup = () => {
       const w = window.innerWidth;
@@ -117,13 +161,9 @@ export default function PixelFall({ scrollProgress }: Props) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
       ctx.imageSmoothingEnabled = false; // pixel-art crispness
-      // Distribute initial sprites: 60% already IN viewport (spread across
-      // the vertical range), 40% still above so they fall in over time.
-      // Otherwise first paint is blank until sprites fall down.
-      sprites = Array.from({ length: SPRITE_COUNT }, (_, i) => {
-        const sp = makeSprite(w, h, i >= Math.floor(SPRITE_COUNT * 0.6));
-        return sp;
-      });
+      sprites = Array.from({ length: SPRITE_COUNT }, (_, i) =>
+        makeSprite(w, h, tileCache.length, i >= Math.floor(SPRITE_COUNT * 0.6)),
+      );
     };
     setup();
 
@@ -135,27 +175,11 @@ export default function PixelFall({ scrollProgress }: Props) {
     let finished = false;
 
     const drawSprite = (s: Sprite) => {
-      const p = PROJECTS[s.projectIdx];
-      const half = s.size / 2;
+      const tile = tileCache[s.tileIdx];
       ctx.save();
       ctx.translate(s.x, s.y);
       ctx.rotate(s.rot);
-      // Drop shadow — solid offset block
-      ctx.fillStyle = PALETTE.shadow;
-      ctx.fillRect(-half + 4, -half + 4, s.size, s.size);
-      // Tile background
-      ctx.fillStyle = p.bg;
-      ctx.fillRect(-half, -half, s.size, s.size);
-      // Chunky pixel border (2px)
-      ctx.strokeStyle = p.edge;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-half + 1, -half + 1, s.size - 2, s.size - 2);
-      // Center glyph — sized to tile
-      ctx.fillStyle = p.fg;
-      ctx.font = `bold ${Math.floor(s.size * 0.5)}px "JetBrains Mono", ui-monospace, monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(p.icon, 0, s.size * 0.03);
+      ctx.drawImage(tile.canvas, -tile.halfW, -tile.halfH);
       ctx.restore();
     };
 
@@ -191,9 +215,10 @@ export default function PixelFall({ scrollProgress }: Props) {
           sp.vy += 0.00012 * dt;
           sp.y += sp.vy * dt;
           sp.rot += sp.vrot * dt;
-          if (sp.y - sp.size / 2 > h) {
+          const tileHalfH = tileCache[sp.tileIdx].halfH;
+          if (sp.y - tileHalfH > h) {
             // Recycle above the top
-            const s2 = makeSprite(w, h, true);
+            const s2 = makeSprite(w, h, tileCache.length, true);
             Object.assign(sp, s2);
           }
           drawSprite(sp);
