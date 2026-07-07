@@ -92,9 +92,18 @@ export default function ScrollCamera({
 
   useFrame(() => {
     if (frozen) return; // intro owns the camera
-    const t = progressToT(progressRef.current);
+    const p = progressRef.current;
+    const t = progressToT(p);
     cameraCurve.getPoint(t, posVec.current);
     lookAtCurve.getPoint(t, lookAtVec.current);
+    // R33 vertical descent: as scroll passes 0.6, add a downward Y
+    // offset so the camera actually drops into the dungeon layer
+    // (which sits at y=-5.5). At scroll 1.0, camera + lookAt have
+    // both dropped ~6 units. Linear ease so the descent feels
+    // deliberate rather than teleporting.
+    const descent = Math.max(0, Math.min(1, (p - 0.6) / 0.4)) * 6.5;
+    posVec.current.y -= descent;
+    lookAtVec.current.y -= descent;
     // Damped follow so scrub jitter smooths out
     camera.position.lerp(posVec.current, 0.18);
     camera.lookAt(lookAtVec.current);

@@ -11,6 +11,7 @@ import GltfProp from "./GltfProp";
 import ScrollCamera from "./ScrollCamera";
 import PostFX from "./PostFX";
 import LivingCavern from "./LivingCavern";
+import Dungeon from "./Dungeon";
 
 type Props = {
   /** Shared scroll progress ref — 0 = arrival, 1 = final drift-out. */
@@ -166,6 +167,12 @@ export default function CaveScene({
           Renders as the "living cavern" middle stage of Grant's vertical
           descent. Instanced geometry keeps it LIGHT. */}
       <LivingCavern scrollProgress={scrollProgress} />
+
+      {/* R33 stage 3: dungeon at the bottom of the descent — stone pillars
+          ringing a torch-lit floor deep below (y = -5.5), with Grant's
+          four real projects as loot chests distributed at scroll depths
+          0.72 / 0.80 / 0.88 / 0.96. Presence-scales in from scroll > 0.6. */}
+      <Dungeon scrollProgress={scrollProgress} />
 
       {/* Per-chapter hero objects — one themed model each, positioned at
           that chapter's lookAt so the scroll-fly camera frames it on
