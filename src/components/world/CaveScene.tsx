@@ -147,20 +147,27 @@ export default function CaveScene({
           rather than pure metal.
           Metalness 0.85 (vs previous 0.05) is what Grant wanted — the
           reflections POP instead of getting eaten by diffuse. */}
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[80, 80, 1, 1]} />
-        <meshPhysicalMaterial
-          color="#04070d"
-          roughness={0.14}
-          metalness={0.85}
-          clearcoat={1}
-          clearcoatRoughness={0.06}
-          anisotropy={0.9}
-          anisotropyRotation={Math.PI / 2}
-          envMapIntensity={0.55}
-          reflectivity={1}
-        />
-      </mesh>
+      {/* R33: hide the wet-metal floor once the camera has descended
+          into the dungeon layer (scroll > 0.7) — otherwise it becomes
+          a "ceiling" over the dungeon and blocks the descent view. */}
+      {scrollProgress < 0.72 && (
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+          <planeGeometry args={[80, 80, 1, 1]} />
+          <meshPhysicalMaterial
+            color="#04070d"
+            roughness={0.14}
+            metalness={0.85}
+            clearcoat={1}
+            clearcoatRoughness={0.06}
+            anisotropy={0.9}
+            anisotropyRotation={Math.PI / 2}
+            envMapIntensity={0.55}
+            reflectivity={1}
+            transparent
+            opacity={Math.max(0, 1 - (scrollProgress - 0.55) / 0.17)}
+          />
+        </mesh>
+      )}
 
       {/* R33 stage 2: living cavern — inverted rock dome + drooping vines
           + bio-luminescent mushrooms + moss patches + floating spores.
