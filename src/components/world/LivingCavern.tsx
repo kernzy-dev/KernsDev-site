@@ -29,6 +29,7 @@ type Props = {
 };
 
 const VINE_COUNT = 42;
+const CLIMBING_VINE_COUNT = 22;
 const MUSHROOM_COUNT = 34;
 const MOSS_COUNT = 60;
 const PLANT_ORB_COUNT = 20;
@@ -90,6 +91,28 @@ export default function LivingCavern({ scrollProgress }: Props) {
         () => 0.02,
         () => 0.35 + Math.random() * 0.45,
       ),
+    [],
+  );
+  // Climbing vines — planted at floor level near the wall, rising UP
+  // the dome. Each has a random height in [1.2, 3.4] and a slight
+  // outward tilt so it hugs the sphere shell.
+  const climbingVines = useMemo(
+    () =>
+      Array.from({ length: CLIMBING_VINE_COUNT }, () => {
+        const theta = Math.random() * Math.PI * 2;
+        const r = 12.5 + Math.random() * 2.5; // hug the wall (dome radius 20)
+        const height = 1.4 + Math.random() * 2.0;
+        return {
+          x: Math.cos(theta) * r,
+          z: Math.sin(theta) * r,
+          y: height * 0.5, // cylinder is centered at its middle
+          scale: 0.35 + Math.random() * 0.4,
+          heightScale: height / 3.0, // cylinderGeom base height = 3.0
+          rot: theta, // orient the outward tilt AWAY from center
+          tilt: 0.14 + Math.random() * 0.12, // radians away from vertical
+          bright: 0.5 + Math.random() * 0.5,
+        };
+      }),
     [],
   );
   const plantOrbs = useMemo(
@@ -177,6 +200,35 @@ export default function LivingCavern({ scrollProgress }: Props) {
               position={[v.x, v.y, v.z]}
               rotation={[Math.PI + Math.sin(i * 0.7) * 0.15, v.rot, Math.cos(i * 0.4) * 0.12]}
               scale={[v.scale, v.scale * 1.4, v.scale]}
+            />
+          ))}
+        </Instances>
+
+        {/* Climbing vines — root at floor near wall, rising UP the dome
+            with a slight outward tilt so they hug the sphere shell.
+            Complements the droopers to satisfy the "vines growing up
+            the walls" brief cue. */}
+        <Instances limit={CLIMBING_VINE_COUNT} range={CLIMBING_VINE_COUNT}>
+          <cylinderGeometry args={[0.05, 0.025, 3.0, 6]} />
+          <meshStandardMaterial
+            color={"#1e4020"}
+            roughness={0.8}
+            metalness={0.0}
+            emissive={MOSS}
+            emissiveIntensity={0.22}
+          />
+          {climbingVines.map((v, i) => (
+            <Instance
+              key={i}
+              position={[v.x, v.y, v.z]}
+              // Base cylinder axis is Y; tilt around the tangent so the
+              // vine leans outward against the dome curvature.
+              rotation={[
+                Math.cos(v.rot) * v.tilt,
+                v.rot,
+                Math.sin(v.rot) * v.tilt,
+              ]}
+              scale={[v.scale, v.heightScale, v.scale]}
             />
           ))}
         </Instances>
