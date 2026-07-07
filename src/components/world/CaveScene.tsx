@@ -57,6 +57,12 @@ export default function CaveScene({
   return (
     <Canvas
       shadows
+      // PERF (Grant 2026-07-07 "lagging like crazy at the opening"): while the 2D
+      // PixelFall overlay fully covers the scene (scroll < ~0.08) the cavern is
+      // invisible — pause the WebGL render loop entirely so the opening costs ~0
+      // GPU. Resume continuous rendering as the morph/fade begins. This is the
+      // actual fix; the pixel canvas was never the bottleneck.
+      frameloop={scrollProgress < 0.08 ? "never" : "always"}
       dpr={[1, 1.5]}
       camera={{
         fov: 42,
