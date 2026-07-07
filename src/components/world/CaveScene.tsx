@@ -10,6 +10,7 @@ import SecondaryMonolith from "./SecondaryMonolith";
 import GltfProp from "./GltfProp";
 import ScrollCamera from "./ScrollCamera";
 import PostFX from "./PostFX";
+import LivingCavern from "./LivingCavern";
 
 type Props = {
   /** Shared scroll progress ref — 0 = arrival, 1 = final drift-out. */
@@ -159,6 +160,12 @@ export default function CaveScene({
           reflectivity={1}
         />
       </mesh>
+
+      {/* R33 stage 2: living cavern — inverted rock dome + drooping vines
+          + bio-luminescent mushrooms + moss patches + floating spores.
+          Renders as the "living cavern" middle stage of Grant's vertical
+          descent. Instanced geometry keeps it LIGHT. */}
+      <LivingCavern scrollProgress={scrollProgress} />
 
       {/* Per-chapter hero objects — one themed model each, positioned at
           that chapter's lookAt so the scroll-fly camera frames it on
