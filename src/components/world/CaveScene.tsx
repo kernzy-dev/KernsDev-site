@@ -56,7 +56,10 @@ export default function CaveScene({
 
   return (
     <Canvas
-      shadows
+      // PERF: shadows DISABLED — this machine has NO discrete GPU (integrated
+      // graphics only), and the real-time shadow pass (directional castShadow +
+      // 1024 shadow map) was the dominant per-frame cost that made scrolling lag.
+      // castShadow/receiveShadow on children are now harmless no-ops.
       // PERF (Grant 2026-07-07 "lagging like crazy at the opening"): while the 2D
       // PixelFall overlay fully covers the scene (scroll < ~0.08) the cavern is
       // invisible — pause the WebGL render loop entirely so the opening costs ~0
