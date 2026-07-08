@@ -139,13 +139,13 @@ export default function LivingCavern({ scrollProgress }: Props) {
     }
   });
 
-  // Presence factor — cavern is fully present only once we're past the
-  // pixel-fall crossfade (scroll > 0.35). Below 0.15 it's still hidden
-  // behind the opaque pixel-art layer, so no visual cost — but its geometry
-  // still needs to render (composited under). Keep it at full lit intensity
-  // once revealed; the pixel layer handles its own fade.
-  const bloom = Math.min(1, Math.max(0, (scrollProgress - 0.18) / 0.22));
-  void bloom; // reserved for future intensity modulation
+  // R35 lighting handoff to the dungeon: cavern lights fade OUT as
+  // the visitor descends past scroll 0.55 → 0.82 (which mirrors the
+  // Dungeon's own presence ramp 0.60 → 0.82). At scroll ≥ 0.82 the
+  // cavern lights are dark and only the dungeon torch drives the scene,
+  // so the descent feels like leaving the cavern behind rather than
+  // watching two lit spaces overlap.
+  const cavernLightGain = 1 - Math.min(1, Math.max(0, (scrollProgress - 0.55) / 0.27));
 
   return (
     <group>
@@ -169,7 +169,7 @@ export default function LivingCavern({ scrollProgress }: Props) {
       <pointLight
         position={[0, 0.9, 0]}
         color={AMBER}
-        intensity={2.8}
+        intensity={2.8 * cavernLightGain}
         distance={14}
         decay={1.6}
       />
@@ -178,7 +178,7 @@ export default function LivingCavern({ scrollProgress }: Props) {
       <pointLight
         position={[0, 6, 0]}
         color={CYAN}
-        intensity={1.8}
+        intensity={1.8 * cavernLightGain}
         distance={18}
         decay={1.8}
       />
@@ -243,7 +243,7 @@ export default function LivingCavern({ scrollProgress }: Props) {
           roughness={0.55}
           metalness={0.0}
           emissive={CYAN}
-          emissiveIntensity={2.6}
+          emissiveIntensity={2.6 * cavernLightGain}
           toneMapped={false}
         />
         {mushrooms.map((m, i) => (
@@ -278,7 +278,7 @@ export default function LivingCavern({ scrollProgress }: Props) {
           roughness={0.85}
           metalness={0.0}
           emissive={MOSS}
-          emissiveIntensity={0.65}
+          emissiveIntensity={0.65 * cavernLightGain}
         />
         {mossPatches.map((p, i) => (
           <Instance
@@ -298,7 +298,7 @@ export default function LivingCavern({ scrollProgress }: Props) {
           <meshStandardMaterial
             color={"#0d1a24"}
             emissive={CYAN}
-            emissiveIntensity={3.2}
+            emissiveIntensity={3.2 * cavernLightGain}
             toneMapped={false}
           />
           {plantOrbs.map((o, i) => (
