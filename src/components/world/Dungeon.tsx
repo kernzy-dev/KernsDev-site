@@ -283,9 +283,96 @@ export default function Dungeon({ scrollProgress }: Props) {
                 decay={1.7}
               />
             )}
+            {/* R35 per-project ID glyph — a distinctive floating shape
+                above the chest in the project's colour, echoing the
+                pixel-fall opening icons. Each project gets its own
+                geometry so it reads at a glance even when the rim
+                colour is subtle. */}
+            <ChestGlyph
+              projectKey={entry.project.key}
+              color={entry.project.color}
+              presence={chestPresence}
+              emissiveGain={emissiveGain}
+            />
           </group>
         );
       })}
+    </group>
+  );
+}
+
+/** Per-project distinctive floating glyph above each loot chest. */
+function ChestGlyph({
+  projectKey,
+  color,
+  presence,
+  emissiveGain,
+}: {
+  projectKey: string;
+  color: string;
+  presence: number;
+  emissiveGain: number;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    // Gentle bob so the glyph reads as "floating loot" rather than static.
+    ref.current.position.y = 0.95 + Math.sin(t * 1.8 + projectKey.length) * 0.05;
+    ref.current.rotation.y = t * 0.6;
+  });
+  const intensity = 3.4 * presence * emissiveGain;
+  return (
+    <group ref={ref} position={[0, 0.95, 0]}>
+      {projectKey === "polymarket-bot" && (
+        // Coin ring — matches "$" from pixel-fall
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.14, 0.045, 8, 20]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={intensity}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
+      {projectKey === "fidel-daytrader" && (
+        // Upward triangle prism — matches "▲"
+        <mesh>
+          <coneGeometry args={[0.14, 0.26, 3]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={intensity}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
+      {projectKey === "factvault" && (
+        // Diamond — matches "◈"
+        <mesh>
+          <octahedronGeometry args={[0.16, 0]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={intensity}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
+      {projectKey === "fire-control" && (
+        // Fireball sphere — pixel-fall has a triangle but fire feels
+        // more spherical + shares the amber tone with the ember dust.
+        <mesh>
+          <sphereGeometry args={[0.15, 12, 10]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={color}
+            emissiveIntensity={intensity}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
     </group>
   );
 }

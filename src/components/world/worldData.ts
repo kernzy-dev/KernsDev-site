@@ -179,7 +179,9 @@ export const PROJECTS: ProjectMarker[] = [
     stat: "14 trades / 24h · 61% win rate",
     status: "online",
     position: [-4.4, 1.4, -6.2],
-    color: "#35E7E0",
+    // R35 unify: colors match PixelFall's per-project palette so the
+    // pixel-fall opening and the Dungeon loot chests read as one identity.
+    color: "#4ade80", // green — $
   },
   {
     key: "fidel-daytrader",
@@ -188,7 +190,7 @@ export const PROJECTS: ProjectMarker[] = [
     stat: "P&L +$1.20 today · signal Q 0.78",
     status: "online",
     position: [-4.4, 1.4, -10.0],
-    color: "#35E7E0",
+    color: "#f87171", // red — ▲
   },
   {
     key: "factvault",
@@ -197,7 +199,7 @@ export const PROJECTS: ProjectMarker[] = [
     stat: "14 queued · 9 uploaded / 7d",
     status: "online",
     position: [0.4, 1.4, -6.2],
-    color: "#F5A623",
+    color: "#60a5fa", // blue — ◈
   },
   {
     key: "fire-control",
@@ -206,7 +208,7 @@ export const PROJECTS: ProjectMarker[] = [
     stat: "3 devices · 11 snapshots",
     status: "online",
     position: [0.4, 1.4, -10.0],
-    color: "#F5A623",
+    color: "#fbbf24", // amber — ▲ (fire)
   },
 ];
 
