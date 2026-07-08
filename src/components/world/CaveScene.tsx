@@ -3,10 +3,7 @@ import { AdaptiveDpr, AdaptiveEvents, Environment, Sparkles, StatsGl } from "@re
 import { Suspense, useMemo } from "react";
 import type { MutableRefObject, RefObject } from "react";
 import * as THREE from "three";
-import { ASSETS, CHAPTERS, PALETTE, PROJECTS, SECONDARY_MONOLITHS } from "./worldData";
-import ChapterHero from "./ChapterHero";
-import ProjectNode from "./ProjectNode";
-import SecondaryMonolith from "./SecondaryMonolith";
+import { ASSETS, CHAPTERS, PALETTE } from "./worldData";
 import GltfProp from "./GltfProp";
 import ScrollCamera from "./ScrollCamera";
 import PostFX from "./PostFX";
@@ -190,37 +187,13 @@ export default function CaveScene({
           0.72 / 0.80 / 0.88 / 0.96. Presence-scales in from scroll > 0.6. */}
       <Dungeon scrollProgress={scrollProgress} />
 
-      {/* Per-chapter hero objects — one themed model each, positioned at
-          that chapter's lookAt so the scroll-fly camera frames it on
-          arrival. R25: chapters now map to real portfolio sections
-          (intro/about/work/services/contact). */}
-      {CHAPTERS.map((c, i) => (
-        <ChapterHero
-          key={c.id}
-          chapter={c}
-          scrollProgress={scrollProgress}
-          phase={i * 1.9}
-        />
-      ))}
-
-      {/* Real projects — Grant's autonomous systems as explorable nodes
-          in the WORK chapter (progress 0.5). Presence-scaled to that
-          chapter window so they only show when the visitor is there. */}
-      {PROJECTS.map((p, i) => (
-        <ProjectNode
-          key={p.key}
-          project={p}
-          scrollProgress={scrollProgress}
-          chapterProgress={0.5}
-          phase={i * 1.3}
-        />
-      ))}
-
-      {/* Secondary monoliths — background parallax layer receding into fog.
-          Each is progressively dimmer + more fog-obscured, sells depth. */}
-      {SECONDARY_MONOLITHS.map((m, i) => (
-        <SecondaryMonolith key={i} data={m} phase={i * 1.7} />
-      ))}
+      {/* R35 cleanup: retired the R25 portfolio-mapped ChapterHero /
+          ProjectNode / SecondaryMonolith renders — they were leftover
+          from the old chapter-flip portfolio model and Grant's new
+          descent vision routes the real projects through the pixel-fall
+          opening + Dungeon loot chests instead. The imported components
+          are kept in the tree in case an R36 retrieval is wanted (e.g.
+          a special "workshop" easter egg). */}
 
       {/* Drifting particle motes — reads as atmosphere volume. Two layers so
           nearby motes are bigger (parallax) than far ones. */}
