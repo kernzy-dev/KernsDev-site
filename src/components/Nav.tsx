@@ -40,6 +40,9 @@ export default function Nav() {
             <a href="#products" className="hover:text-white transition-colors">Products</a>
           </Magnetic>
           <Magnetic radius={48} strength={0.4}>
+            <a href="/shop" className="hover:text-white transition-colors">Prints</a>
+          </Magnetic>
+          <Magnetic radius={48} strength={0.4}>
             <a href="#services" className="hover:text-white transition-colors">Services</a>
           </Magnetic>
           <Magnetic radius={70} strength={0.3}>

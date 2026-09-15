@@ -19,6 +19,10 @@ const Footer = lazy(() => import("./components/Footer"));
 // /world prototype — explorable 3D dev-plaza. Gated behind a route so it
 // ships as its own chunk and doesn't touch the main landing page.
 const WorldExperience = lazy(() => import("./components/world/WorldExperience"));
+// /shop — 3D-print storefront (Stripe Payment Links). Own chunk / route.
+const Shop = lazy(() => import("./components/Shop"));
+// /services — dedicated services page (agency-style, AI-specialist brand).
+const ServicesPage = lazy(() => import("./components/ServicesPage"));
 
 const SECTION_PLACEHOLDER = (
   <div className="py-20 md:py-28 min-h-[640px]" aria-hidden />
@@ -29,15 +33,31 @@ const WORLD_FALLBACK = <div className="fixed inset-0 bg-neutral-950" />;
 export default function App() {
   // Stable across the component's lifetime — no router, so pathname doesn't
   // change without a full reload. Captured once via useState initializer.
-  const [isWorld] = useState(
-    () => typeof window !== "undefined" && window.location.pathname === "/world",
+  const [route] = useState(
+    () => (typeof window !== "undefined" ? window.location.pathname : "/"),
   );
   const [booted, setBooted] = useState(false);
 
-  if (isWorld) {
+  if (route === "/world") {
     return (
       <Suspense fallback={WORLD_FALLBACK}>
         <WorldExperience />
+      </Suspense>
+    );
+  }
+
+  if (route === "/shop") {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
+        <Shop />
+      </Suspense>
+    );
+  }
+
+  if (route === "/services") {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
+        <ServicesPage />
       </Suspense>
     );
   }
