@@ -23,6 +23,8 @@ const WorldExperience = lazy(() => import("./components/world/WorldExperience"))
 const Shop = lazy(() => import("./components/Shop"));
 // /services — dedicated services page (agency-style, AI-specialist brand).
 const ServicesPage = lazy(() => import("./components/ServicesPage"));
+// /3dtap — NFC-tap landing page for the 3D prints (phones tapping physical tags).
+const ThreeDTap = lazy(() => import("./components/ThreeDTap"));
 
 const SECTION_PLACEHOLDER = (
   <div className="py-20 md:py-28 min-h-[640px]" aria-hidden />
@@ -58,6 +60,14 @@ export default function App() {
     return (
       <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
         <ServicesPage />
+      </Suspense>
+    );
+  }
+
+  if (route === "/3dtap") {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
+        <ThreeDTap />
       </Suspense>
     );
   }
