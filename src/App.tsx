@@ -78,13 +78,16 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
+        {/* Services up front — what I actually offer, right after the hook. */}
+        <Suspense fallback={SECTION_PLACEHOLDER}>
+          <Services />
+        </Suspense>
         <BuildingShowcase />
         <StatusBlock />
         <Suspense fallback={SECTION_PLACEHOLDER}>
           <About />
           <FeaturedWork />
           <Products />
-          <Services />
           <Contact />
         </Suspense>
       </main>

@@ -8,19 +8,67 @@ import * as THREE from "three";
 const MODEL = "/models/robot.glb";
 useGLTF.preload(MODEL);
 
-export default function Robot() {
+// One-shot "emote" clips (play once, then settle back to Idle) vs. looping states.
+const EMOTES = new Set(["Yes", "No", "Wave", "ThumbsUp", "Jump", "Punch"]);
+
+export default function Robot({ pose }: { pose?: string | null }) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL);
-  const { actions, names } = useAnimations(animations, group);
+  const { actions, names, mixer } = useAnimations(animations, group);
+  const current = useRef<THREE.AnimationAction | null>(null);
+  const posing = useRef(false);
 
-  // Play a calm idle loop (RobotExpressive ships an "Idle" clip).
+  // Cross-fade to a clip. Emotes play once + clamp; states loop.
+  function fadeTo(name: string, fade = 0.3) {
+    const next = actions[name];
+    if (!next) return;
+    const prev = current.current;
+    if (prev === next) return;
+    next.reset();
+    next.enabled = true;
+    if (EMOTES.has(name)) {
+      next.setLoop(THREE.LoopOnce, 1);
+      next.clampWhenFinished = true;
+    } else {
+      next.setLoop(THREE.LoopRepeat, Infinity);
+      next.clampWhenFinished = false;
+    }
+    next.fadeIn(fade).play();
+    prev?.fadeOut(fade);
+    current.current = next;
+  }
+
+  // Start on Idle.
   useEffect(() => {
-    const clip = actions["Idle"] ?? (names[0] ? actions[names[0]] : undefined);
-    clip?.reset().fadeIn(0.5).play();
-    return () => void clip?.fadeOut(0.3);
+    const first = actions["Idle"] ?? (names[0] ? actions[names[0]] : undefined);
+    if (first) {
+      first.reset().fadeIn(0.5).play();
+      current.current = first;
+    }
+    return () => void current.current?.fadeOut(0.3);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, names]);
 
-  // Cast/receive shadows on every mesh so the scene lighting reads.
+  // When an emote finishes, drift back to Idle.
+  useEffect(() => {
+    if (!mixer) return;
+    const onFinished = (e: { action: THREE.AnimationAction }) => {
+      const name = (e.action.getClip() as THREE.AnimationClip).name;
+      if (EMOTES.has(name)) fadeTo("Idle", 0.4);
+    };
+    mixer.addEventListener("finished", onFinished);
+    return () => mixer.removeEventListener("finished", onFinished);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mixer, actions]);
+
+  // React to the selected value → play its pose (or return to Idle).
+  useEffect(() => {
+    posing.current = !!pose;
+    fadeTo(pose || "Idle");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pose]);
+
+  // Shadows on every mesh.
   useEffect(() => {
     scene.traverse((o) => {
       const m = o as THREE.Mesh;
@@ -31,9 +79,16 @@ export default function Robot() {
     });
   }, [scene]);
 
-  // Slow turntable rotation — a product-shot spin.
+  // Slow turntable when idle; ease to face front while showing a pose.
   useFrame((_, dt) => {
-    if (group.current) group.current.rotation.y += dt * 0.3;
+    const g = group.current;
+    if (!g) return;
+    if (posing.current) {
+      const y = THREE.MathUtils.euclideanModulo(g.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+      g.rotation.y = THREE.MathUtils.damp(y, 0, 4, dt);
+    } else {
+      g.rotation.y += dt * 0.3;
+    }
   });
 
   return (

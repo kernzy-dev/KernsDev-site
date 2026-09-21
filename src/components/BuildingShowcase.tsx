@@ -34,6 +34,13 @@ const VALUES: Record<ValueKey, { title: string; subtitle: string; body: string }
 
 const VALUE_KEYS: ValueKey[] = ["honest", "fast", "detail"];
 
+// Each value maps to a RobotExpressive animation clip the robot performs.
+const POSE: Record<ValueKey, string> = {
+  honest: "Yes", // a sincere nod
+  fast: "Running", // literal speed
+  detail: "ThumbsUp", // approval / the finish
+};
+
 function StaticFallback() {
   return (
     <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-8">
@@ -52,13 +59,25 @@ function StaticFallback() {
 }
 
 export default function BuildingShowcase() {
-  const [active, setActive] = useState<ValueKey | null>(null);
+  // `pinned` is the sticky selection (chip click / arrows); `hovered` is a
+  // transient preview. The visible value is hover-preview over the pinned one.
+  const [pinned, setPinned] = useState<ValueKey | null>(null);
+  const [hovered, setHovered] = useState<ValueKey | null>(null);
   const [webglOk, setWebglOk] = useState<boolean | null>(null);
+  const active = hovered ?? pinned;
   const activeContent = active ? VALUES[active] : null;
 
   useEffect(() => {
     setWebglOk(hasWebGL());
   }, []);
+
+  // Step through the values with the arrows (wraps around).
+  const step = (dir: 1 | -1) => {
+    const i = active ? VALUE_KEYS.indexOf(active) : dir === 1 ? -1 : 0;
+    const next = VALUE_KEYS[(i + dir + VALUE_KEYS.length) % VALUE_KEYS.length];
+    setHovered(null);
+    setPinned(next);
+  };
 
   return (
     <section className="py-20 md:py-28 border-t border-neutral-900 relative overflow-hidden">
@@ -69,7 +88,8 @@ export default function BuildingShowcase() {
               <p className="section-eyebrow mb-2">How I work</p>
               <h2 className="text-3xl md:text-4xl font-bold">Three things, every build.</h2>
               <p className="text-sm text-neutral-500 mt-2 max-w-md">
-                Hover a value — this is what every project gets, no matter the size.
+                Pick a value — the robot reacts. Hover the chips, or step through with
+                the arrows. This is what every project gets, no matter the size.
               </p>
             </div>
           </div>
@@ -87,7 +107,7 @@ export default function BuildingShowcase() {
           ) : (
             <ThreeErrorBoundary fallback={<StaticFallback />}>
               <Suspense fallback={<LoadingScreen />}>
-                <Scene />
+                <Scene pose={active ? POSE[active] : null} />
               </Suspense>
             </ThreeErrorBoundary>
           )}
@@ -130,11 +150,11 @@ export default function BuildingShowcase() {
               <button
                 key={key}
                 type="button"
-                onMouseEnter={() => setActive(key)}
-                onFocus={() => setActive(key)}
-                onMouseLeave={() => setActive(null)}
-                onBlur={() => setActive(null)}
-                onClick={() => setActive(active === key ? null : key)}
+                onMouseEnter={() => setHovered(key)}
+                onFocus={() => setHovered(key)}
+                onMouseLeave={() => setHovered(null)}
+                onBlur={() => setHovered(null)}
+                onClick={() => setPinned(pinned === key ? null : key)}
                 aria-pressed={active === key}
                 aria-label={`${VALUES[key].title} — ${VALUES[key].subtitle}`}
                 className={`px-2 py-1 rounded border transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 ${
@@ -147,6 +167,38 @@ export default function BuildingShowcase() {
               </button>
             ))}
           </div>
+
+          {/* Arrow nav — step the robot through each value. */}
+          {webglOk && (
+            <div className="absolute bottom-6 right-6 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => step(-1)}
+                aria-label="Previous value"
+                className="grid place-items-center h-9 w-9 rounded-full bg-neutral-900/80 border border-neutral-700 text-neutral-300 hover:text-white hover:border-accent/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                ‹
+              </button>
+              <div className="flex items-center gap-1.5" aria-hidden>
+                {VALUE_KEYS.map((key) => (
+                  <span
+                    key={key}
+                    className={`h-1.5 rounded-full transition-all ${
+                      active === key ? "w-5 bg-accent" : "w-1.5 bg-neutral-700"
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => step(1)}
+                aria-label="Next value"
+                className="grid place-items-center h-9 w-9 rounded-full bg-neutral-900/80 border border-neutral-700 text-neutral-300 hover:text-white hover:border-accent/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

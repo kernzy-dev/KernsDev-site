@@ -20,7 +20,7 @@ import CameraRig from "./CameraRig";
  * image-based lighting + brand-violet accents, with the full post-processing
  * pipeline (Bloom + Vignette + chromatic aberration + SMAA).
  */
-export default function Scene() {
+export default function Scene({ pose }: { pose?: string | null }) {
   const [ready, setReady] = useState(true);
 
   if (!ready) {
@@ -97,7 +97,7 @@ export default function Scene() {
       />
 
       <Suspense fallback={null}>
-        <Robot />
+        <Robot pose={pose} />
       </Suspense>
       <CameraRig />
 
