@@ -40,7 +40,7 @@ export const PRINTS: Print[] = [
     material: "PLA Matte",
     size: "230 × 90 × 40 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/4gM6oGckJ6Gi9IQe3b00000",
     badge: "Bestseller",
   },
   {
@@ -54,7 +54,7 @@ export const PRINTS: Print[] = [
     material: "Silk PLA",
     size: "150 × 70 × 25 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/6oUfZg2K9fcOcV2gbj00001",
     badge: "Fan favorite",
   },
   {
@@ -68,7 +68,7 @@ export const PRINTS: Print[] = [
     material: "PETG",
     size: "160 × 120 × 45 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/6oUcN4ckJ5Ce4ow8IR00002",
   },
   {
     id: "phone-tablet-stand",
@@ -81,7 +81,7 @@ export const PRINTS: Print[] = [
     material: "PETG",
     size: "110 × 90 × 80 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/4gMfZg70p3u68EMf7f00003",
   },
   {
     id: "headphone-stand",
@@ -94,7 +94,7 @@ export const PRINTS: Print[] = [
     material: "PLA Matte",
     size: "130 × 110 × 280 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa3cu98xd4G9IQ4sB00004",
   },
   {
     id: "geometric-planter",
@@ -107,7 +107,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "110 × 110 × 100 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/fZu28qbgF4yag7e8IR00005",
   },
   {
     id: "dice-tower",
@@ -120,7 +120,7 @@ export const PRINTS: Print[] = [
     material: "PLA Matte",
     size: "90 × 90 × 200 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/cNi9AS5Wl6GiaMUf7f00006",
   },
   {
     id: "custom-nameplate",
@@ -133,7 +133,7 @@ export const PRINTS: Print[] = [
     material: "Silk PLA",
     size: "180 × 45 × 40 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/eVq28qdoNc0Cg7e0cl00007",
     badge: "Personalized",
   },
 ];
