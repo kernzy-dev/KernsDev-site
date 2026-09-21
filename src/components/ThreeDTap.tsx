@@ -69,7 +69,7 @@ export default function ThreeDTap() {
               </span>
             </span>
           </a>
-          <a href="/shop" className="btn-primary px-4 py-2 text-sm">Shop →</a>
+          <a href="/3dprintshop" className="btn-primary px-4 py-2 text-sm">Shop →</a>
         </div>
       </header>
 
@@ -115,7 +115,7 @@ export default function ThreeDTap() {
 
             <Reveal delay={0.15}>
               <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <a href="/shop" className="btn-primary w-full justify-center sm:w-auto">
+                <a href="/3dprintshop" className="btn-primary w-full justify-center sm:w-auto">
                   Browse the prints →
                 </a>
                 <a href="/#contact" className="btn-ghost w-full justify-center sm:w-auto">
@@ -167,7 +167,7 @@ export default function ThreeDTap() {
           <Reveal delay={0.1}>
             <div className="mt-10 text-center">
               <a
-                href="/shop"
+                href="/3dprintshop"
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-light hover:text-accent"
               >
                 See the full collection →
@@ -207,7 +207,7 @@ export default function ThreeDTap() {
                   Every piece is printed to order — grab one from the shop or ask
                   me for something custom.
                 </p>
-                <a href="/shop" className="btn-primary mt-6 justify-center">Shop all prints →</a>
+                <a href="/3dprintshop" className="btn-primary mt-6 justify-center">Shop all prints →</a>
               </div>
             </div>
           </Reveal>
@@ -268,7 +268,7 @@ function PrintCard({ print: p }: { print: Print }) {
             </a>
           ) : (
             <a
-              href="/shop"
+              href="/3dprintshop"
               className="inline-flex w-full justify-center rounded-md border border-neutral-800 px-4 py-2 text-sm text-neutral-400 transition-colors hover:border-accent/40 hover:text-accent-light"
             >
               View in shop

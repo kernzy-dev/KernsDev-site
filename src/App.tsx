@@ -48,7 +48,7 @@ export default function App() {
     );
   }
 
-  if (route === "/shop") {
+  if (route === "/shop" || route === "/3dprintshop") {
     return (
       <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
         <Shop />
