@@ -69,6 +69,17 @@ export default function Shop() {
             </ul>
           </div>
         </Reveal>
+
+        <Reveal delay={0.2}>
+          <p className="mt-10 text-xs text-neutral-600 max-w-2xl leading-relaxed">
+            Model credits: several prints are made from community designs, shared
+            under Creative Commons. Gridfinity organizer by jaketmiller93, headphone
+            stand by MrMercenary, phone stand by heinandre, planter by Kodrann, dice
+            tower by FresnelTHz, articulated slug by 8ran (CC&nbsp;BY / CC&nbsp;BY-SA).
+            Dragon by illuminarti (public domain). Nameplate is our own design. We
+            sell the printed object; design credit stays with the original makers.
+          </p>
+        </Reveal>
       </main>
     </div>
   );
