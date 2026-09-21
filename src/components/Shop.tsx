@@ -93,7 +93,17 @@ function PrintCard({ print: p }: { print: Print }) {
         <span className="absolute inset-0 grid place-items-center text-neutral-700 text-xs uppercase tracking-widest">
           {p.material}
         </span>
-        {p.image && (
+        {p.video ? (
+          <video
+            src={p.video}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : p.image ? (
           <img
             src={p.image}
             alt={p.name}
@@ -104,7 +114,7 @@ function PrintCard({ print: p }: { print: Print }) {
             }}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-        )}
+        ) : null}
         {p.badge && (
           <span className="absolute top-3 left-3 z-10 text-[11px] uppercase tracking-wider bg-accent/90 text-white px-2 py-1 rounded">
             {p.badge}

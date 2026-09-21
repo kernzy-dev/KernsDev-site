@@ -16,6 +16,9 @@ export type Print = {
   price: string;
   /** Image under /public/prints/ (e.g. "/prints/dragon.jpg"). Missing = gradient fallback. */
   image?: string;
+  /** Optional product video under /public/prints/ (e.g. "/prints/dragon.mp4").
+   *  When set, the card plays it (muted autoplay loop) instead of the image. */
+  video?: string;
   material: string; // "PLA Matte", "PETG", ...
   size: string; // "120 × 80 × 40 mm"
   leadTime?: string; // "Made to order · ships in 3–5 days"
