@@ -1,6 +1,10 @@
+import { Suspense, lazy, useState } from "react";
 import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import { PRINTS, type Print } from "../lib/prints";
+
+// Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
+const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
 
 /**
  * /shop — 3D-print storefront. Physical prints, checkout via Stripe Payment
@@ -9,6 +13,7 @@ import { PRINTS, type Print } from "../lib/prints";
  */
 export default function Shop() {
   const live = PRINTS.filter((p) => p.stripeLink && !p.soldOut).length;
+  const [viewing, setViewing] = useState<Print | null>(null);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -45,7 +50,7 @@ export default function Shop() {
           {PRINTS.map((p, i) => (
             <Reveal key={p.id} delay={i * 0.08}>
               <Weighted tilt={4} lift={12} className="h-full">
-                <PrintCard print={p} />
+                <PrintCard print={p} onView={p.model ? () => setViewing(p) : undefined} />
               </Weighted>
             </Reveal>
           ))}
@@ -81,6 +86,17 @@ export default function Shop() {
           </p>
         </Reveal>
       </main>
+
+      {viewing?.model && (
+        <Suspense fallback={null}>
+          <ProductViewer3D
+            url={viewing.model}
+            color={viewing.modelColor}
+            name={viewing.name}
+            onClose={() => setViewing(null)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -94,7 +110,7 @@ function safeHref(u: string): string {
           u.startsWith("/") || u.startsWith("./") || u.startsWith("../")) ? u : "";
 }
 
-function PrintCard({ print: p }: { print: Print }) {
+function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) {
   // Only "buyable" if the link is present, in stock, AND a safe scheme.
   const buyable = !p.soldOut && !!safeHref(p.stripeLink);
   return (
@@ -104,6 +120,24 @@ function PrintCard({ print: p }: { print: Print }) {
         <span className="absolute inset-0 grid place-items-center text-neutral-700 text-xs uppercase tracking-widest">
           {p.material}
         </span>
+        {onView && (
+          <>
+            <button
+              type="button"
+              onClick={onView}
+              aria-label={`View ${p.name} in 3D`}
+              className="absolute inset-0 z-20 cursor-grab"
+            />
+            <span className="absolute top-3 right-3 z-30 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider bg-neutral-950/70 text-neutral-100 px-2 py-1 rounded-full border border-neutral-700 group-hover:border-accent/60 group-hover:text-white transition-colors pointer-events-none">
+              <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 3a9 9 0 1 0 9 9" strokeLinecap="round" />
+                <path d="M21 12a9 9 0 0 0-9-9" strokeLinecap="round" opacity="0.4" />
+                <path d="M16 8l5-5M16 3h5v5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              360°
+            </span>
+          </>
+        )}
         {p.video ? (
           <video
             src={p.video}
