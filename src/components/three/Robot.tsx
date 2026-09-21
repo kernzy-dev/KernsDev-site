@@ -37,7 +37,7 @@ export default function Robot() {
   });
 
   return (
-    <group ref={group} position={[0, 0, 0]} scale={2.4}>
+    <group ref={group} position={[0, 0, 0]} scale={1.55}>
       <primitive object={scene} />
     </group>
   );

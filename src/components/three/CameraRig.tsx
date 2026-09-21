@@ -16,7 +16,7 @@ export default function CameraRig() {
   const startTime = useRef<number | null>(null);
   const startPos = useRef(new THREE.Vector3(0, 30, 0.1));
   const endPos = useRef(new THREE.Vector3(11, 7, 14));
-  const lookAt = useRef(new THREE.Vector3(0, 2.2, 0));
+  const lookAt = useRef(new THREE.Vector3(0, 1.6, 0));
 
   useEffect(() => {
     // If reduced motion is on, snap to the final cinematic angle immediately.
