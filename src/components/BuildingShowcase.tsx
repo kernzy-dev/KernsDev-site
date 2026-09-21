@@ -3,27 +3,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import Reveal from "./motion/Reveal";
 import ThreeErrorBoundary from "./three/ThreeErrorBoundary";
 import LoadingScreen from "./three/LoadingScreen";
-import type { BuildingPart } from "./three/Building";
 import { hasWebGL } from "../lib/webgl";
 
 // Lazy-load THE ENTIRE 3D scene module (which itself imports R3F + Three).
 // Headless / no-WebGL browsers never download this chunk.
 const Scene = lazy(() => import("./three/Scene"));
 
-const VALUES: Record<Exclude<BuildingPart, null>, { title: string; subtitle: string; body: string }> = {
-  foundation: {
+type ValueKey = "honest" | "fast" | "detail";
+
+const VALUES: Record<ValueKey, { title: string; subtitle: string; body: string }> = {
+  honest: {
     title: "Honest",
-    subtitle: "The foundation",
+    subtitle: "No surprises",
     body:
       "If a project won't work the way you're imagining, I tell you up front — not after the invoice. No oversold scope, no surprise overages.",
   },
-  walls: {
+  fast: {
     title: "Fast",
-    subtitle: "The structure",
+    subtitle: "Weeks, not quarters",
     body:
-      "I ship working software in weeks, not quarters. Real features get into your hands early so you can iterate from what you actually use.",
+      "I ship working software fast — real features in your hands early, so you can iterate from what you actually use.",
   },
-  roof: {
+  detail: {
     title: "Detail-oriented",
     subtitle: "The finish",
     body:
@@ -31,29 +32,27 @@ const VALUES: Record<Exclude<BuildingPart, null>, { title: string; subtitle: str
   },
 };
 
-function StaticFallback({ active }: { active: BuildingPart }) {
+const VALUE_KEYS: ValueKey[] = ["honest", "fast", "detail"];
+
+function StaticFallback() {
   return (
     <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-8">
       <div className="text-center max-w-md">
-        <div className="text-7xl mb-4 opacity-30">🏗</div>
+        <div className="text-7xl mb-4 opacity-30">🤖</div>
         <p className="text-sm text-neutral-400">
           The interactive 3D scene needs WebGL — your browser doesn't have it (or it's disabled).
-          The values map cleanly anyway: <span className="text-neutral-200">Foundation = Honest</span>,
-          <span className="text-neutral-200"> Walls = Fast</span>,
-          <span className="text-neutral-200"> Roof = Detail-oriented</span>.
+          The values hold anyway:
+          <span className="text-neutral-200"> Honest</span>,
+          <span className="text-neutral-200"> Fast</span>,
+          <span className="text-neutral-200"> Detail-oriented</span>.
         </p>
-        {active && (
-          <p className="mt-4 text-xs text-accent">
-            (Currently focused: {active})
-          </p>
-        )}
       </div>
     </div>
   );
 }
 
 export default function BuildingShowcase() {
-  const [active, setActive] = useState<BuildingPart>(null);
+  const [active, setActive] = useState<ValueKey | null>(null);
   const [webglOk, setWebglOk] = useState<boolean | null>(null);
   const activeContent = active ? VALUES[active] : null;
 
@@ -68,9 +67,9 @@ export default function BuildingShowcase() {
           <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
             <div>
               <p className="section-eyebrow mb-2">How I work</p>
-              <h2 className="text-3xl md:text-4xl font-bold">A build, broken down.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold">Three things, every build.</h2>
               <p className="text-sm text-neutral-500 mt-2 max-w-md">
-                Hover any part of the building. Each one is a value I bring to the work.
+                Hover a value — this is what every project gets, no matter the size.
               </p>
             </div>
           </div>
@@ -78,22 +77,22 @@ export default function BuildingShowcase() {
 
         <div
           role="img"
-          aria-label="Interactive 3D scene of a Georgian mansion. Each architectural part represents a value I bring to the work: the foundation is honest, the walls are fast, the roof is detail-oriented."
+          aria-label="Animated 3D robot — the centerpiece of an AI-focused dev studio. Three values define the work: honest, fast, and detail-oriented."
           className="relative rounded-2xl overflow-hidden border border-neutral-800 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 h-[520px] md:h-[640px]"
         >
           {webglOk === false ? (
-            <StaticFallback active={active} />
+            <StaticFallback />
           ) : webglOk === null ? (
             <LoadingScreen />
           ) : (
-            <ThreeErrorBoundary fallback={<StaticFallback active={active} />}>
+            <ThreeErrorBoundary fallback={<StaticFallback />}>
               <Suspense fallback={<LoadingScreen />}>
-                <Scene active={active} setActive={setActive} />
+                <Scene />
               </Suspense>
             </ThreeErrorBoundary>
           )}
 
-          {/* Hover tooltip overlay */}
+          {/* Value tooltip overlay */}
           <AnimatePresence mode="wait">
             {activeContent && (
               <motion.div
@@ -117,36 +116,34 @@ export default function BuildingShowcase() {
 
           {!activeContent && webglOk && (
             <div className="absolute bottom-6 left-6 text-xs text-neutral-500 font-mono pointer-events-none">
-              ↑ hover any part
+              select a value ↗
             </div>
           )}
 
-          {/* Legend badges — also act as keyboard / touch entry points.
-              Focusing or clicking one triggers the same active-state highlight as
-              hovering the corresponding 3D part. */}
+          {/* Value chips — hover / focus / tap to reveal each value. */}
           <div
             role="group"
             aria-label="Select a value to learn about"
             className="absolute top-4 right-4 flex gap-2 text-[10px] uppercase tracking-wider"
           >
-            {(["foundation", "walls", "roof"] as const).map((part) => (
+            {VALUE_KEYS.map((key) => (
               <button
-                key={part}
+                key={key}
                 type="button"
-                onMouseEnter={() => setActive(part)}
-                onFocus={() => setActive(part)}
+                onMouseEnter={() => setActive(key)}
+                onFocus={() => setActive(key)}
                 onMouseLeave={() => setActive(null)}
                 onBlur={() => setActive(null)}
-                onClick={() => setActive(active === part ? null : part)}
-                aria-pressed={active === part}
-                aria-label={`${VALUES[part].title} — ${VALUES[part].subtitle}`}
+                onClick={() => setActive(active === key ? null : key)}
+                aria-pressed={active === key}
+                aria-label={`${VALUES[key].title} — ${VALUES[key].subtitle}`}
                 className={`px-2 py-1 rounded border transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 ${
-                  active === part
+                  active === key
                     ? "bg-accent text-white border-accent"
                     : "bg-neutral-900/60 text-neutral-500 border-neutral-800 hover:text-neutral-300"
                 }`}
               >
-                {VALUES[part].title}
+                {VALUES[key].title}
               </button>
             ))}
           </div>

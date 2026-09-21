@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { Suspense, useState } from "react";
 import { ContactShadows, SoftShadows, Environment } from "@react-three/drei";
 import {
   EffectComposer,
@@ -12,20 +12,15 @@ import {
 import { BlendFunction } from "postprocessing";
 import { Vector2 } from "three";
 import * as THREE from "three";
-import Building, { type BuildingPart } from "./Building";
-import Landscape from "./Landscape";
+import Robot from "./Robot";
 import CameraRig from "./CameraRig";
 
-type Props = {
-  active: BuildingPart;
-  setActive: Dispatch<SetStateAction<BuildingPart>>;
-};
-
 /**
- * Full 3D scene — Building + Landscape + golden-hour HDR environment +
- * post-processing pipeline (Bloom + Vignette + chromatic aberration + SMAA).
+ * Full 3D scene — an animated CC0 robot on a dark studio backdrop, lit by HDR
+ * image-based lighting + brand-violet accents, with the full post-processing
+ * pipeline (Bloom + Vignette + chromatic aberration + SMAA).
  */
-export default function Scene({ active, setActive }: Props) {
+export default function Scene() {
   const [ready, setReady] = useState(true);
 
   if (!ready) {
@@ -50,20 +45,22 @@ export default function Scene({ active, setActive }: Props) {
       }}
       onError={() => setReady(false)}
     >
+      {/* Dark studio backdrop — the robot + violet accents read as "AI/tech". */}
+      <color attach="background" args={["#08080f"]} />
+
       {/* Soft shadows — PCSS approximation */}
       <SoftShadows size={25} samples={10} focus={0.6} />
 
-      {/* Real PolyHaven HDR — drives the sky background AND image-based lighting.
-          The single biggest realism upgrade available — atmospheric photo, not procedural. */}
+      {/* PolyHaven HDR for image-based lighting ONLY (no `background`, so the sky
+          doesn't show) — gives the robot rich, realistic reflections on the dark set. */}
       <Environment
         files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_43d_clear_puresky_1k.hdr"
-        background
-        environmentIntensity={1.0}
+        environmentIntensity={0.55}
       />
 
-      {/* LIGHTING — warm golden hour */}
-      <hemisphereLight args={["#ffdcb0", "#3a4a2a", 0.85]} />
-      <ambientLight intensity={0.55} color="#fff5e0" />
+      {/* LIGHTING — cool studio + warm rim */}
+      <hemisphereLight args={["#cdd6ff", "#0a0a12", 0.5]} />
+      <ambientLight intensity={0.35} color="#dfe6ff" />
 
       <directionalLight
         position={[12, 14, 6]}
@@ -99,12 +96,13 @@ export default function Scene({ active, setActive }: Props) {
         color="#000000"
       />
 
-      <Landscape />
-      <Building active={active} setActive={setActive} />
+      <Suspense fallback={null}>
+        <Robot />
+      </Suspense>
       <CameraRig />
 
-      {/* Atmospheric fog */}
-      <fog attach="fog" args={["#d9b48a", 28, 60]} />
+      {/* Atmospheric fog — dark, for depth on the studio set */}
+      <fog attach="fog" args={["#08080f", 20, 52]} />
 
       {/* === POST-PROCESSING — turns "render" into "movie" === */}
       <EffectComposer multisampling={0}>
