@@ -18,7 +18,7 @@ const products: Product[] = [
     description:
       "Discover, mirror, and remote-control Fire TV / Google TV / Shield sticks on your LAN. Sideload from your PC, schedule reboots, kill ad bloat, snapshot setups, and roll new sticks in 30 seconds with templates. Free for 1 TV, Pro unlocks the fleet.",
     href: "/fleetcast",
-    status: "Live",
+    status: "Coming soon",
     badge: "First product",
     image: "/fleetcast-dashboard.png",
   },
@@ -92,7 +92,7 @@ export default function Products() {
                     <p className="text-lg text-neutral-200 font-medium mb-3">{p.oneLiner}</p>
                     <p className="text-sm text-neutral-400 leading-relaxed mb-6">{p.description}</p>
                     <a href={p.href} className="btn-primary text-sm">
-                      Try it →
+                      Learn more →
                     </a>
                   </div>
                 </article>
