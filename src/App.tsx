@@ -2,7 +2,6 @@ import { lazy, Suspense, useState } from "react";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import BootSequence from "./components/BootSequence";
-import BuildingShowcase from "./components/BuildingShowcase";
 import StatusBlock from "./components/StatusBlock";
 import CursorTrail from "./components/motion/CursorTrail";
 
@@ -92,7 +91,6 @@ export default function App() {
         <Suspense fallback={SECTION_PLACEHOLDER}>
           <Services />
         </Suspense>
-        <BuildingShowcase />
         <StatusBlock />
         <Suspense fallback={SECTION_PLACEHOLDER}>
           <About />

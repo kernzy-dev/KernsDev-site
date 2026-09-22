@@ -2,6 +2,7 @@ import { Suspense, lazy, useState } from "react";
 import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import CustomPrint from "./CustomPrint";
+import Logo from "./Logo";
 import { PRINTS, type Print } from "../lib/prints";
 
 // Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
@@ -21,10 +22,7 @@ export default function Shop() {
       {/* Slim top bar */}
       <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
         <div className="container-tight flex items-center justify-between h-16">
-          <a href="/" className="flex items-center gap-2 font-display font-bold text-lg">
-            <span className="bg-accent text-white w-8 h-8 rounded-md grid place-items-center">K</span>
-            <span>KernsDev</span>
-          </a>
+          <Logo />
           <a href="/" className="text-sm text-neutral-300 hover:text-white transition-colors">
             ← Back to site
           </a>

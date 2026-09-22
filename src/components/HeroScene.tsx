@@ -28,7 +28,13 @@ function ScrollRig({ progress }: { progress: MotionValue<number> }) {
   return null;
 }
 
-export default function HeroScene({ progress }: { progress: MotionValue<number> }) {
+export default function HeroScene({
+  progress,
+  pose,
+}: {
+  progress: MotionValue<number>;
+  pose?: string | null;
+}) {
   return (
     <Canvas
       shadows
@@ -52,7 +58,7 @@ export default function HeroScene({ progress }: { progress: MotionValue<number> 
       <pointLight position={[-6, 3, -5]} intensity={0.9} distance={13} color="#8b5cf6" decay={1.6} />
 
       <Suspense fallback={null}>
-        <Robot />
+        <Robot pose={pose} />
       </Suspense>
 
       <ContactShadows

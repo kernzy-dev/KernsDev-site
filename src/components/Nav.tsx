@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Magnetic from "./motion/Magnetic";
+import { LogoMark } from "./Logo";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -25,19 +26,11 @@ export default function Nav() {
         Skip to products
       </a>
       <div className="container-tight flex items-center justify-between h-16">
-        <a href="#top" className="flex items-center gap-2.5 font-display font-bold text-lg">
-          <svg viewBox="0 0 64 64" className="h-8 w-8" aria-hidden>
-            <defs>
-              <linearGradient id="navk" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#c084fc" />
-                <stop offset="1" stopColor="#7e22ce" />
-              </linearGradient>
-            </defs>
-            <rect width="64" height="64" rx="15" fill="url(#navk)" />
-            <path d="M20 15 h7 v13.5 L40.5 15 H50 L34.5 31.5 L51 49 h-9.5 L27 34.5 V49 h-7 z" fill="#fff" />
-            <rect x="41" y="43.5" width="7" height="5.5" rx="1" fill="#e9d5ff" />
-          </svg>
-          <span>Kerns<span className="text-accent-light">Dev</span></span>
+        <a href="#top" className="flex items-center gap-2.5 text-lg">
+          <LogoMark />
+          <span className="font-mono font-semibold tracking-tight">
+            kerns<span className="text-accent">dev</span>
+          </span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-300">
           <Magnetic radius={48} strength={0.4}>
