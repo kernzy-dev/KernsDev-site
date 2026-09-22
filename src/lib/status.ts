@@ -1,16 +1,15 @@
 /**
  * Status contract + live data for the "Currently running." block.
  *
- * Data is pulled LIVE IN THE BROWSER — no build step, no backend, no dependency
- * on any one machine. Each provider hits a CORS-open, keyless public API and
- * maps the response onto a bot card. Anything a provider can't supply (API
- * down, rate-limited, or CORS-blocked) falls back to the simulated seed below
- * and is honestly labelled as such.
+ * HONEST DATA ONLY. Every card is backed by a real, CORS-open, keyless public
+ * API fetched live in the browser — no backend, no build step, no fabrication.
+ * If a provider fails (offline, rate-limited, CORS), that card falls back to a
+ * clearly-labelled "sim" seed and says so. Bots that can't be made genuinely
+ * live from the browser were removed rather than faked.
  *
- * Note: only CORS-open public APIs can be read directly from the browser.
- * Polymarket's Gamma API sends `Access-Control-Allow-Origin: *` so it works;
- * stock-quote APIs (Yahoo, Stooq) do not, so fidel-daytrader can't go live
- * client-side without a key or a proxy.
+ * Live providers:
+ *   • polymarket-bot — Polymarket Gamma API (contested prediction markets)
+ *   • github         — GitHub public activity for the KernsDev account
  *
  * Log timestamps (`LogEntry.at`) are absolute epoch milliseconds.
  */
@@ -28,13 +27,14 @@ export type BotStatus = {
   status: BotState;
   stats: Stat[];
   log: LogEntry[];
-  /** "live" = real data fetched in-browser; "seed" = local simulation. */
+  /** "live" = real data fetched in-browser; "seed" = local fallback. */
   source: "live" | "seed";
 };
 
-// ── Seed (fallback + simulation) ────────────────────────────────────────────
-// `atOffset` is ms relative to "now" (negative = in the past) so seeded log
-// lines always look recently-aged regardless of when the bundle was built.
+// ── Seed (fallback only, shown while a live feed is unreachable) ──────────────
+// `atOffset` is ms relative to "now" (negative = past) so seeded log lines look
+// recently-aged regardless of when the bundle was built. Every seed here has a
+// matching LIVE provider below — the seed is just graceful degradation.
 
 type SeedBot = Omit<BotStatus, "log" | "source"> & {
   log: { atOffset: number; line: string }[];
@@ -44,98 +44,39 @@ export const SEED: SeedBot[] = [
   {
     key: "polymarket-bot",
     name: "polymarket-bot",
-    blurb: "Algorithmic trading on Polymarket prediction markets. Watches news + edges.",
+    blurb: "Watches live Polymarket prediction markets — contested edges by 24h volume.",
     status: "online",
     stats: [
-      { label: "trades 24h", value: "14" },
-      { label: "win rate", value: "61%" },
-      { label: "open positions", value: "3" },
+      { label: "tracked", value: "—" },
+      { label: "vol 24h", value: "—" },
+      { label: "hottest", value: "—" },
     ],
-    log: [
-      { atOffset: -12_000, line: "closed YES TRUMP-2028 0.42→0.51 (+21%)" },
-      { atOffset: -3 * 60_000, line: "opened NO FED-CUT-Q2 @ 0.38" },
-      { atOffset: -7 * 60_000, line: "news scan: Reuters fed-cut sentiment ↓" },
-    ],
+    log: [{ atOffset: -8000, line: "connecting to Polymarket Gamma API…" }],
   },
   {
-    key: "fidel-daytrader",
-    name: "fidel-daytrader",
-    blurb: "Day-trading paper account on Alpaca. Tech signal + news sentiment hybrid.",
+    key: "github",
+    name: "github/kernzy-dev",
+    blurb: "Live GitHub activity — public commits, repos, and releases as they happen.",
     status: "online",
     stats: [
-      { label: "P&L today", value: "+$1.20" },
-      { label: "open positions", value: "2" },
-      { label: "signal Q", value: "0.78" },
+      { label: "public repos", value: "—" },
+      { label: "commits 7d", value: "—" },
+      { label: "followers", value: "—" },
     ],
-    log: [
-      { atOffset: -45_000, line: "BUY NVDA @ 142.18 — RSI cross + news+" },
-      { atOffset: -4 * 60_000, line: "SELL AAPL @ 188.42 (+0.6%)" },
-      { atOffset: -12 * 60_000, line: "watchlist refresh: 6 tickers" },
-    ],
-  },
-  {
-    key: "factvault",
-    name: "factvault",
-    blurb: "Automated dark-facts YouTube Shorts pipeline. Script → TTS → render → upload.",
-    status: "online",
-    stats: [
-      { label: "queued", value: "14" },
-      { label: "uploaded 7d", value: "9" },
-      { label: "avg length", value: "52s" },
-    ],
-    log: [
-      { atOffset: -2 * 60_000, line: "render q'd: 'Antarctic Cold War bunkers'" },
-      { atOffset: -25 * 60_000, line: "uploaded: 'The day the sky burned green'" },
-      { atOffset: -55 * 60_000, line: "tts: 6 scripts voiced" },
-    ],
-  },
-  {
-    key: "fire-control",
-    name: "fire-control",
-    blurb: "Fire TV fleet manager. Sideload, mirror, snapshots — CLI + web UI.",
-    status: "online",
-    stats: [
-      { label: "devices", value: "3" },
-      { label: "snapshots", value: "11" },
-      { label: "installs 24h", value: "2" },
-    ],
-    log: [
-      { atOffset: -90_000, line: "fleet sync ok — 3/3 reachable" },
-      { atOffset: -8 * 60_000, line: "snapshot taken: living-room-tv pre-update" },
-      { atOffset: -34 * 60_000, line: "sideload: kodi v21.1 → bedroom-tv" },
-    ],
+    log: [{ atOffset: -8000, line: "fetching public event stream…" }],
   },
 ];
 
-/** Synthetic activity used to make *seed* (not live) bots feel alive. */
+/** Synthetic activity used only to keep a *fallback* seed card from looking
+ *  frozen while its live feed is unreachable. Never applied to live cards. */
 export const TICK_EVENTS: Record<string, string[]> = {
   "polymarket-bot": [
-    "news scan: AP fed-cut sentiment ↑",
-    "rebalance: closing GOP-PRIMARY position",
-    "edge check: SUPREME-COURT-RULING > 3% margin",
-    "opened YES TX-SENATE-2026 @ 0.34",
-    "scanning markets… 12 new candidates",
+    "retrying Polymarket Gamma API…",
+    "awaiting CORS-open market feed…",
   ],
-  "fidel-daytrader": [
-    "BUY TSLA @ 248.03 — momentum + earnings+",
-    "SELL MSFT @ 421.12 (+0.4%)",
-    "signal flush: 4 stale tickers dropped",
-    "watchlist refresh: 6 tickers",
-    "RSI cross on AMD — eyes only",
-  ],
-  factvault: [
-    "render q'd: 'Why nobody lives on Devon Island'",
-    "tts: 3 scripts voiced",
-    "uploaded: 'The lightbulb that wouldn't die'",
-    "stockpile: 8 b-roll clips fetched",
-    "script: 'Roman concrete still confuses scientists'",
-  ],
-  "fire-control": [
-    "fleet sync ok — 3/3 reachable",
-    "snapshot taken: bedroom-tv pre-update",
-    "bloat disabled: AmazonAppstore → living-room",
-    "mirror: kitchen-tv ← living-room launcher",
-    "device check-in: bedroom-tv heartbeat ok",
+  github: [
+    "retrying GitHub public events…",
+    "awaiting api.github.com…",
   ],
 };
 
@@ -216,79 +157,78 @@ async function fetchPolymarket(signal?: AbortSignal): Promise<BotStatus | null> 
   }
 }
 
-/** Approximate US equities session (9:30–16:00 ET, Mon–Fri). DST-correct via
- *  the IANA zone; holidays are not accounted for (close enough for a label). */
-function usMarketOpen(): boolean {
-  try {
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).formatToParts(new Date());
-    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-    const wd = get("weekday");
-    if (wd === "Sat" || wd === "Sun") return false;
-    const mins = Number(get("hour")) * 60 + Number(get("minute"));
-    return mins >= 9 * 60 + 30 && mins < 16 * 60;
-  } catch {
-    return false;
-  }
-}
-
-const STOCK_WATCH = ["NVDA", "TSLA", "AAPL", "AMD", "MSFT", "SPY"];
+const GH_USER = "kernzy-dev";
 
 /**
- * fidel-daytrader — live equity quotes via Finnhub (CORS-open). Needs a free
- * key in `VITE_FINNHUB_KEY`, inlined into the static bundle at build time. With
- * no key the provider no-ops and the card stays simulated.
+ * github — live public activity via the GitHub REST API (CORS-open, keyless;
+ * ~60 req/hr per visitor, plenty for a page view). Real repos, followers, and
+ * a live event stream (pushes, releases, PRs). No feed → card stays simulated.
  */
-async function fetchStocks(signal?: AbortSignal): Promise<BotStatus | null> {
-  const key = import.meta.env.VITE_FINNHUB_KEY;
-  if (!key) return null;
+async function fetchGithub(signal?: AbortSignal): Promise<BotStatus | null> {
   try {
-    const quotes = (
-      await Promise.all(
-        STOCK_WATCH.map(async (sym) => {
-          try {
-            const res = await fetch(
-              `https://finnhub.io/api/v1/quote?symbol=${sym}&token=${key}`,
-              { signal },
-            );
-            if (!res.ok) return null;
-            const q = (await res.json()) as { c?: number; dp?: number };
-            const price = Number(q.c);
-            const pct = Number(q.dp);
-            if (!Number.isFinite(price) || price === 0) return null;
-            return { sym, price, pct: Number.isFinite(pct) ? pct : 0 };
-          } catch {
-            return null;
-          }
-        }),
-      )
-    ).filter((q): q is { sym: string; price: number; pct: number } => q != null);
-    if (quotes.length === 0) return null;
-
-    const open = usMarketOpen();
-    const arrow = (p: number) => (p >= 0 ? "▲" : "▼");
-    const byMove = [...quotes].sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct));
-    const top = byMove[0];
+    const [uRes, eRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${GH_USER}`, { signal }),
+      fetch(`https://api.github.com/users/${GH_USER}/events/public?per_page=30`, { signal }),
+    ]);
+    if (!uRes.ok) return null;
+    const u = (await uRes.json()) as { public_repos?: number; followers?: number };
+    const events = (eRes.ok ? await eRes.json() : []) as Array<Record<string, any>>;
     const now = Date.now();
+    const weekAgo = now - 7 * 864e5;
+
+    const commits7d = events
+      .filter((e) => e.type === "PushEvent" && Date.parse(e.created_at) >= weekAgo)
+      .reduce((a, e) => a + (e.payload?.commits?.length || 0), 0);
+    const dayAgo = now - 864e5;
+    const pushes24h = events.filter(
+      (e) => e.type === "PushEvent" && Date.parse(e.created_at) >= dayAgo,
+    ).length;
+    const latestAt = events.length ? Date.parse(events[0].created_at) : 0;
+    const relShort = (ms: number): string => {
+      const s = Math.max(0, Math.floor((now - ms) / 1000));
+      if (!ms) return "—";
+      if (s < 60) return s + "s";
+      if (s < 3600) return Math.floor(s / 60) + "m";
+      if (s < 864e2) return Math.floor(s / 3600) + "h";
+      return Math.floor(s / 864e2) + "d";
+    };
+
+    const line = (e: Record<string, any>): string => {
+      const repo = String(e.repo?.name || "").split("/").pop() || "repo";
+      switch (e.type) {
+        case "PushEvent":
+          return `pushed ${e.payload?.commits?.length || 0} commit(s) → ${repo}`;
+        case "CreateEvent":
+          return `created ${e.payload?.ref_type || "ref"} → ${repo}`;
+        case "PullRequestEvent":
+          return `${e.payload?.action || "updated"} PR → ${repo}`;
+        case "ReleaseEvent":
+          return `released ${e.payload?.release?.tag_name || ""} → ${repo}`;
+        case "IssuesEvent":
+          return `${e.payload?.action || "updated"} issue → ${repo}`;
+        case "WatchEvent":
+          return `starred ${repo}`;
+        default:
+          return `${String(e.type).replace("Event", "").toLowerCase()} → ${repo}`;
+      }
+    };
+    const log = events.slice(0, 4).map((e) => ({
+      at: Date.parse(e.created_at) || now,
+      line: line(e),
+    }));
+    if (log.length === 0 && !u.public_repos) return null;
+
     return {
-      key: "fidel-daytrader",
-      name: "fidel-daytrader",
-      blurb: "Tracks a live equities watchlist — real quotes, signal + sentiment hybrid.",
-      status: open ? "online" : "scheduled",
+      key: "github",
+      name: `github/${GH_USER}`,
+      blurb: "Live GitHub activity — public commits, repos, and releases as they happen.",
+      status: log.length ? "online" : "idle",
       stats: [
-        { label: "watching", value: String(quotes.length) },
-        { label: "top mover", value: `${top.sym} ${arrow(top.pct)}${Math.abs(top.pct).toFixed(1)}%` },
-        { label: "market", value: open ? "open" : "closed" },
+        { label: "commits 7d", value: String(commits7d) },
+        { label: "pushes 24h", value: String(pushes24h) },
+        { label: "last active", value: relShort(latestAt) },
       ],
-      log: byMove.slice(0, 4).map((q, i) => ({
-        at: now - i * 1000,
-        line: `${q.sym} ${q.price.toFixed(2)} ${arrow(q.pct)}${Math.abs(q.pct).toFixed(1)}%`,
-      })),
+      log: log.length ? log : [{ at: now, line: "no recent public activity" }],
       source: "live",
     };
   } catch {
@@ -297,10 +237,10 @@ async function fetchStocks(signal?: AbortSignal): Promise<BotStatus | null> {
 }
 
 // Browser-side live providers. Each returns null on any failure (offline,
-// rate-limited, CORS, missing key) and the bot falls back to its simulated seed.
+// rate-limited, CORS) and the bot falls back to its simulated seed.
 const PROVIDERS: Array<(signal?: AbortSignal) => Promise<BotStatus | null>> = [
   fetchPolymarket,
-  fetchStocks,
+  fetchGithub,
 ];
 
 export type LoadedStatus = {

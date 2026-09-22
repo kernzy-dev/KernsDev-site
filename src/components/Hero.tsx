@@ -1,11 +1,17 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import useReducedMotion from "../hooks/useReducedMotion";
 import Magnetic from "./motion/Magnetic";
+import { hasWebGL } from "../lib/webgl";
+
+// Immersive 3D hero scene — its own chunk (pulls in R3F/Three), only fetched
+// when WebGL is present.
+const HeroScene = lazy(() => import("./HeroScene"));
 
 export default function Hero() {
   const reduced = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
+  const [webglOk, setWebglOk] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -14,13 +20,36 @@ export default function Hero() {
   const textY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, 120]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.8], reduced ? [1, 1] : [1, 0]);
   const meshScale = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [1, 1.4]);
+  // Fade the 3D scene out slightly as the hero scrolls away.
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0]);
+
+  // Only mount the 3D scene when the browser can actually render it.
+  useEffect(() => {
+    if (!reduced) setWebglOk(hasWebGL());
+  }, [reduced]);
 
   return (
     <section
       ref={ref}
       id="top"
-      className="relative pt-32 pb-20 md:pt-44 md:pb-40 overflow-hidden"
+      className="relative min-h-screen flex flex-col justify-start pt-28 md:pt-36 pb-24 overflow-hidden"
     >
+      {/* Immersive 3D robot — full-bleed behind the copy. */}
+      {webglOk && (
+        <motion.div style={{ opacity: sceneOpacity }} className="absolute inset-0 z-0">
+          <Suspense fallback={null}>
+            <HeroScene progress={scrollYProgress} />
+          </Suspense>
+        </motion.div>
+      )}
+      {/* Legibility scrim — darken top + bottom, let the robot read through the middle. */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(8,8,15,0.72) 0%, rgba(8,8,15,0.20) 40%, rgba(8,8,15,0.12) 62%, rgba(8,8,15,0.88) 100%)",
+        }}
+      />
       {/* Layered animated background — multiple offset gradients on slow loops + subtle grid */}
       <motion.div
         style={{ scale: meshScale }}
@@ -65,7 +94,7 @@ export default function Hero() {
         />
       </motion.div>
 
-      <div className="container-tight w-full relative">
+      <div className="container-tight w-full relative z-[2]">
         <motion.div
           style={{ y: textY, opacity: textOpacity }}
           className="text-center max-w-3xl mx-auto"
@@ -84,8 +113,8 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-5xl md:text-7xl font-bold leading-[1.05] mb-6"
           >
-            I build the software you<br className="hidden md:block" />{" "}
-            <span className="text-accent">can't buy off the shelf.</span>
+            I build the AI-driven software<br className="hidden md:block" />{" "}
+            <span className="text-accent">you can't buy off the shelf.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -113,36 +142,6 @@ export default function Hero() {
               </a>
             </Magnetic>
           </motion.div>
-        </motion.div>
-
-        {/* Trio of qualifiers — staggered in */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.15, delayChildren: 0.8 } },
-          }}
-          className="mt-20 md:mt-28 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
-        >
-          {[
-            { word: "Fast", desc: "Shipped, not perfect. Iterate from real use." },
-            { word: "Honest", desc: "If it won't work, I tell you up front." },
-            { word: "Detail-oriented", desc: "The thing visitors notice but can't name." },
-          ].map((q) => (
-            <motion.div
-              key={q.word}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-              }}
-              className="text-center md:text-left"
-            >
-              <div className="text-2xl font-display font-bold text-accent">{q.word}</div>
-              <div className="text-sm text-neutral-400 mt-1">{q.desc}</div>
-            </motion.div>
-          ))}
         </motion.div>
 
         {/* Subtle scroll cue — bouncing arrow, static when reduced-motion */}

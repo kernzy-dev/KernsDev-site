@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { clone as skeletonClone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import * as THREE from "three";
 
 // CC0 "RobotExpressive" by Tomás Laulhé (via three.js examples) — the AI/tech
@@ -14,6 +15,10 @@ const EMOTES = new Set(["Yes", "No", "Wave", "ThumbsUp", "Jump", "Punch"]);
 export default function Robot({ pose }: { pose?: string | null }) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL);
+  // useGLTF returns ONE shared scene object; a three.js object can only be
+  // mounted in one place. The site now shows the robot in two canvases (hero +
+  // values), so clone per-instance (SkeletonUtils handles the skinned mesh).
+  const model = useMemo(() => skeletonClone(scene), [scene]);
   const { actions, names, mixer } = useAnimations(animations, group);
   const current = useRef<THREE.AnimationAction | null>(null);
   const posing = useRef(false);
@@ -70,14 +75,14 @@ export default function Robot({ pose }: { pose?: string | null }) {
 
   // Shadows on every mesh.
   useEffect(() => {
-    scene.traverse((o) => {
+    model.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.isMesh) {
         m.castShadow = true;
         m.receiveShadow = true;
       }
     });
-  }, [scene]);
+  }, [model]);
 
   // Slow turntable when idle; ease to face front while showing a pose.
   useFrame((_, dt) => {
@@ -93,7 +98,7 @@ export default function Robot({ pose }: { pose?: string | null }) {
 
   return (
     <group ref={group} position={[0, 0, 0]} scale={1.55}>
-      <primitive object={scene} />
+      <primitive object={model} />
     </group>
   );
 }

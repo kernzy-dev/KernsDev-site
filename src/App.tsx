@@ -25,6 +25,8 @@ const Shop = lazy(() => import("./components/Shop"));
 const ServicesPage = lazy(() => import("./components/ServicesPage"));
 // /3dtap — NFC-tap landing page for the 3D prints (phones tapping physical tags).
 const ThreeDTap = lazy(() => import("./components/ThreeDTap"));
+// /fleetcast — product landing for the Android-TV fleet manager (in development).
+const FleetCast = lazy(() => import("./components/FleetCast"));
 
 const SECTION_PLACEHOLDER = (
   <div className="py-20 md:py-28 min-h-[640px]" aria-hidden />
@@ -68,6 +70,14 @@ export default function App() {
     return (
       <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
         <ThreeDTap />
+      </Suspense>
+    );
+  }
+
+  if (route === "/fleetcast") {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
+        <FleetCast />
       </Suspense>
     );
   }
