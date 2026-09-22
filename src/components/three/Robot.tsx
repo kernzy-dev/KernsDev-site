@@ -12,7 +12,7 @@ useGLTF.preload(MODEL);
 // One-shot "emote" clips (play once, then settle back to Idle) vs. looping states.
 const EMOTES = new Set(["Yes", "No", "Wave", "ThumbsUp", "Jump", "Punch"]);
 
-export default function Robot({ pose }: { pose?: string | null }) {
+export default function Robot({ pose, scale = 1.55 }: { pose?: string | null; scale?: number }) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL);
   // useGLTF returns ONE shared scene object; a three.js object can only be
@@ -97,7 +97,7 @@ export default function Robot({ pose }: { pose?: string | null }) {
   });
 
   return (
-    <group ref={group} position={[0, 0, 0]} scale={1.55}>
+    <group ref={group} position={[0, 0, 0]} scale={scale}>
       <primitive object={model} />
     </group>
   );

@@ -18,11 +18,11 @@ function ScrollRig({ progress }: { progress: MotionValue<number> }) {
   const look = new THREE.Vector3();
   useFrame(({ camera }) => {
     const p = progress.get(); // 0 (top) → 1 (scrolled past hero)
-    // Pulled back + aimed at the robot's mid so the FULL figure (head included)
-    // fits with headroom on any aspect ratio. Eases up + back as you scroll away.
-    target.set(0, 2.2 + p * 3.0, 9.4 + p * 4.2);
+    // Small robot + far camera aimed at its center = the FULL figure (head
+    // included) always fits with big margin, any aspect. Eases up/back on scroll.
+    target.set(0, 1.35 + p * 2.4, 10.5 + p * 4.2);
     camera.position.lerp(target, 0.08);
-    look.set(0, 1.3 + p * 0.55, 0);
+    look.set(0, 0.62 + p * 0.5, 0);
     camera.lookAt(look);
   });
   return null;
@@ -40,7 +40,7 @@ export default function HeroScene({
       shadows
       dpr={[1, 1.6]}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-      camera={{ fov: 35, near: 0.1, far: 100, position: [0, 2.2, 9.4] }}
+      camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.35, 10.5] }}
     >
       <hemisphereLight args={["#cdd6ff", "#0a0a12", 0.6]} />
       <ambientLight intensity={0.3} color="#dfe6ff" />
@@ -58,7 +58,7 @@ export default function HeroScene({
       <pointLight position={[-6, 3, -5]} intensity={0.9} distance={13} color="#8b5cf6" decay={1.6} />
 
       <Suspense fallback={null}>
-        <Robot pose={pose} />
+        <Robot pose={pose} scale={0.42} />
       </Suspense>
 
       <ContactShadows
