@@ -126,7 +126,7 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
             className="section-eyebrow mb-4"
           >
-            Hi, I'm Grant.
+            AI Solutions &amp; Automation Consultant · Somerset, KY
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -143,8 +143,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg md:text-xl text-neutral-300 mb-10 max-w-2xl mx-auto"
           >
-            Custom web apps, automation, and AI integrations for businesses and individuals who need
-            something specific — built fast, honest, and detail-oriented.
+            Somerset, KY–based AI solutions &amp; automation consultant — custom AI systems, agents,
+            and software for Kentucky businesses (and clients anywhere) who need something specific.
+            Built fast, honest, and detail-oriented.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

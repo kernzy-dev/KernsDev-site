@@ -1,3 +1,7 @@
+# KernsDev — AI solutions & automation consultant, Somerset, KY
+# All crawlers welcome, including AI/LLM search bots (GPTBot, ClaudeBot,
+# PerplexityBot, Google-Extended, etc.). AI-readable summary: /llms.txt
+
 User-agent: *
 Allow: /
 
