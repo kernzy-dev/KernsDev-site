@@ -1,6 +1,7 @@
 import { Suspense, lazy, useState } from "react";
 import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
+import CustomPrint from "./CustomPrint";
 import { PRINTS, type Print } from "../lib/prints";
 
 // Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
@@ -63,6 +64,9 @@ export default function Shop() {
             </p>
           </Reveal>
         )}
+
+        {/* Bring-your-own-model custom print intake */}
+        <CustomPrint />
 
         <Reveal delay={0.15}>
           <div className="mt-16 border-t border-neutral-900 pt-8 text-sm text-neutral-500 max-w-2xl">
