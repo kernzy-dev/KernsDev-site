@@ -39,6 +39,22 @@ export type Print = {
 // disabled "Coming soon" so nothing broken ships. Add photos to /public/prints/.
 export const PRINTS: Print[] = [
   {
+    id: "halloween-pumpkin-cat",
+    name: "Jack-o'-Lantern Kitty",
+    tagline: "Chibi cat peeking from a carved pumpkin.",
+    description:
+      "A chibi kitty tucked into a carved jack-o'-lantern — a cute seasonal desk piece or Halloween gift. Made to order; pick your colors.",
+    price: "$22",
+    image: "/prints/halloween-pumpkin-cat.webp",
+    model: "/models/shop/halloween-pumpkin-cat.glb",
+    modelColor: "e0842e",
+    material: "PLA",
+    size: "75 × 75 × 75 mm",
+    leadTime: "Made to order · ships in 3–5 days",
+    stripeLink: "",
+    badge: "Halloween",
+  },
+  {
     id: "articulated-dragon",
     name: "Winged Dragon",
     tagline: "Detailed winged dragon centerpiece.",
