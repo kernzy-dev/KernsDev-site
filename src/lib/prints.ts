@@ -28,11 +28,48 @@ export type Print = {
   material: string; // "PLA Matte", "PETG", ...
   size: string; // "120 × 80 × 40 mm"
   leadTime?: string; // "Made to order · ships in 3–5 days"
-  /** Stripe Payment Link URL (https://buy.stripe.com/...). Empty = shows "Coming soon". */
+  /** Stripe Payment Link URL for the SMALL/base size (https://buy.stripe.com/...). Empty = "Coming soon". */
   stripeLink: string;
+  /** Stripe links for the scaled sizes; filled in once priced + created. */
+  sizeLinks?: { M?: string; L?: string };
   badge?: string;
   soldOut?: boolean;
 };
+
+/** A selectable size for a product — dimensions + price + its own checkout link. */
+export type SizeOption = {
+  key: "S" | "M" | "L";
+  name: string;
+  dims: string;
+  price: string;
+  stripeLink: string;
+};
+
+// Size scaling rule: dimensions scale linearly; price scales ~with print
+// time/material (between area and volume). S = the product's base size/price.
+const SIZE_RULES = [
+  { key: "S" as const, name: "Small", dim: 1.0, price: 1.0 },
+  { key: "M" as const, name: "Medium", dim: 1.6, price: 2.2 },
+  { key: "L" as const, name: "Large", dim: 2.2, price: 4.0 },
+];
+
+const scaleDims = (size: string, f: number) =>
+  size.replace(/[\d.]+/g, (n) => String(Math.round(parseFloat(n) * f)));
+const scalePrice = (price: string, f: number) => {
+  const n = parseFloat(price.replace(/[^\d.]/g, "")) || 0;
+  return "$" + Math.round(n * f);
+};
+
+/** Build the three size options for a product from its base size + price. */
+export function sizeOptions(p: Print): SizeOption[] {
+  return SIZE_RULES.map((r) => ({
+    key: r.key,
+    name: r.name,
+    dims: scaleDims(p.size, r.dim),
+    price: scalePrice(p.price, r.price),
+    stripeLink: r.key === "S" ? p.stripeLink : p.sizeLinks?.[r.key] ?? "",
+  }));
+}
 
 // Starter lineup — all NON-BRANDED / commercially-sellable subjects (no fan-art
 // IP). Leave stripeLink "" until the Payment Link exists; the card then shows a

@@ -3,7 +3,7 @@ import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import CustomPrint from "./CustomPrint";
 import Logo from "./Logo";
-import { PRINTS, type Print } from "../lib/prints";
+import { PRINTS, sizeOptions, type Print } from "../lib/prints";
 
 // Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
 const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
@@ -113,8 +113,10 @@ function safeHref(u: string): string {
 }
 
 function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) {
-  // Only "buyable" if the link is present, in stock, AND a safe scheme.
-  const buyable = !p.soldOut && !!safeHref(p.stripeLink);
+  const sizes = sizeOptions(p);
+  const [size, setSize] = useState(sizes[0]);
+  // Only "buyable" if the SELECTED size has a link, in stock, AND a safe scheme.
+  const buyable = !p.soldOut && !!safeHref(size.stripeLink);
   return (
     <article className="group relative bg-gradient-to-br from-neutral-900/60 to-neutral-900/20 border border-neutral-800 hover:border-accent/40 rounded-2xl overflow-hidden transition-colors h-full flex flex-col">
       {/* Image (gradient fallback if the file is missing) */}
@@ -172,30 +174,50 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-xl font-display font-bold">{p.name}</h3>
-          <span className="text-lg font-semibold text-neutral-100 whitespace-nowrap">{p.price}</span>
+          <span className="text-lg font-semibold text-neutral-100 whitespace-nowrap">{size.price}</span>
         </div>
         <p className="text-sm text-neutral-300 font-medium mt-1">{p.tagline}</p>
         <p className="text-sm text-neutral-400 leading-relaxed mt-3">{p.description}</p>
 
-        <dl className="text-xs text-neutral-500 mt-4 space-y-0.5">
+        {/* Size selector — S / M / L, scales dimensions + price */}
+        <div className="mt-4 flex gap-1.5" role="group" aria-label="Choose a size">
+          {sizes.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => setSize(s)}
+              aria-pressed={size.key === s.key}
+              title={`${s.name} — ${s.dims}`}
+              className={`flex-1 text-xs font-medium py-1.5 rounded-md border transition-colors ${
+                size.key === s.key
+                  ? "bg-accent text-white border-accent"
+                  : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
+              }`}
+            >
+              {s.key}
+            </button>
+          ))}
+        </div>
+
+        <dl className="text-xs text-neutral-500 mt-3 space-y-0.5">
           <div><span className="text-neutral-600">Material:</span> {p.material}</div>
-          <div><span className="text-neutral-600">Size:</span> {p.size}</div>
+          <div><span className="text-neutral-600">{size.name} size:</span> {size.dims}</div>
           {p.leadTime && <div>{p.leadTime}</div>}
         </dl>
 
         <div className="mt-auto pt-5">
           {buyable ? (
             <a
-              href={safeHref(p.stripeLink)}
+              href={safeHref(size.stripeLink)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary text-sm w-full text-center"
             >
-              Buy — {p.price}
+              Buy {size.name} — {size.price}
             </a>
           ) : (
             <span className="inline-flex w-full justify-center text-sm border border-neutral-800 text-neutral-500 px-4 py-2 rounded-md cursor-not-allowed">
-              {p.soldOut ? "Sold out" : "Coming soon"}
+              {p.soldOut ? "Sold out" : `${size.name} — coming soon`}
             </span>
           )}
         </div>
