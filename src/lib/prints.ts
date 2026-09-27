@@ -51,7 +51,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "75 × 75 × 75 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQ00igAZ3u67AIbV30000a",
     badge: "Halloween",
   },
   {
