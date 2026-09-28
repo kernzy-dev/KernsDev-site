@@ -49,8 +49,8 @@ export type SizeOption = {
 // time/material (between area and volume). S = the product's base size/price.
 const SIZE_RULES = [
   { key: "S" as const, name: "Small", dim: 1.0, price: 1.0 },
-  { key: "M" as const, name: "Medium", dim: 1.6, price: 2.2 },
-  { key: "L" as const, name: "Large", dim: 2.2, price: 4.0 },
+  { key: "M" as const, name: "Medium", dim: 1.6, price: 1.8 },
+  { key: "L" as const, name: "Large", dim: 2.2, price: 3.0 },
 ];
 
 const scaleDims = (size: string, f: number) =>
@@ -90,6 +90,22 @@ export const PRINTS: Print[] = [
     leadTime: "Made to order · ships in 3–5 days",
     stripeLink: "https://buy.stripe.com/5kQ00igAZ3u67AIbV30000a",
     badge: "Halloween",
+  },
+  {
+    id: "neutral-pumpkin",
+    name: "Ridged Pumpkin",
+    tagline: "Minimalist ridged pumpkin — neutral fall decor.",
+    description:
+      "A clean, ridged decorative pumpkin in a minimalist neutral style — modern farmhouse fall & Halloween decor. Made to order; pick your size and color. Large fills the full print bed for a real statement piece.",
+    price: "$28",
+    image: "/prints/neutral-pumpkin.webp",
+    model: "/models/shop/neutral-pumpkin.glb",
+    modelColor: "ece7dc",
+    material: "PLA",
+    size: "116 × 116 × 103 mm",
+    leadTime: "Made to order · ships in 3–5 days",
+    stripeLink: "",
+    badge: "New",
   },
   {
     id: "articulated-dragon",
