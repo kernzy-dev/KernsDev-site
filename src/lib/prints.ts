@@ -34,7 +34,36 @@ export type Print = {
   sizeLinks?: { M?: string; L?: string };
   badge?: string;
   soldOut?: boolean;
+  /** Category tags for the shop's filter bar (e.g. ["Halloween", "Home & Decor"]). */
+  tags?: string[];
 };
+
+// Category order for the filter bar. Products carry `tags` from this set; the bar
+// shows "All" + these (only the ones actually used appear).
+export const CATEGORY_ORDER = [
+  "Halloween",
+  "Home & Decor",
+  "Desk & Office",
+  "Tabletop & Games",
+  "Toys & Fidgets",
+  "Personalized",
+];
+
+/** Distinct categories actually used by the catalog, in CATEGORY_ORDER. */
+export function catalogCategories(): string[] {
+  const used = new Set(PRINTS.flatMap((p) => p.tags ?? []));
+  return CATEGORY_ORDER.filter((c) => used.has(c));
+}
+
+/** Distinct materials actually used by the catalog, alphabetical. */
+export function catalogMaterials(): string[] {
+  return Array.from(new Set(PRINTS.map((p) => p.material))).sort();
+}
+
+/** Numeric price (from the "$28" display string) for sorting/filtering. */
+export function priceValue(p: Print): number {
+  return parseFloat(p.price.replace(/[^\d.]/g, "")) || 0;
+}
 
 /** A selectable size for a product — dimensions + price + its own checkout link. */
 export type SizeOption = {
@@ -77,6 +106,7 @@ export function sizeOptions(p: Print): SizeOption[] {
 export const PRINTS: Print[] = [
   {
     id: "halloween-pumpkin-cat",
+    tags: ["Halloween", "Home & Decor"],
     name: "Jack-o'-Lantern Kitty",
     tagline: "Chibi cat peeking from a carved pumpkin.",
     description:
@@ -93,6 +123,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "neutral-pumpkin",
+    tags: ["Halloween", "Home & Decor"],
     name: "Ridged Pumpkin",
     tagline: "Minimalist ridged pumpkin — neutral fall decor.",
     description:
@@ -109,6 +140,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "halloween-witch-dog",
+    tags: ["Halloween", "Home & Decor"],
     name: "Witchy Wiener Dog",
     tagline: "Dachshund in a witch hat — full Halloween charm.",
     description:
@@ -125,6 +157,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "articulated-dragon",
+    tags: ["Tabletop & Games", "Home & Decor"],
     name: "Winged Dragon",
     tagline: "Detailed winged dragon centerpiece.",
     description:
@@ -141,6 +174,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "articulated-axolotl",
+    tags: ["Toys & Fidgets"],
     name: "Articulated Slug",
     tagline: "Squishy, wiggly print-in-place fidget.",
     description:
@@ -157,6 +191,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "desk-organizer",
+    tags: ["Desk & Office"],
     name: "Modular Desk Organizer",
     tagline: "Gridfinity bins for pens, cables & bits.",
     description:
@@ -172,6 +207,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "phone-tablet-stand",
+    tags: ["Desk & Office"],
     name: "Minimalist Phone Stand",
     tagline: "Desk, nightstand, kitchen counter.",
     description:
@@ -187,6 +223,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "headphone-stand",
+    tags: ["Desk & Office"],
     name: "Headphone Stand",
     tagline: "Clears the desk, shows off the cans.",
     description:
@@ -202,6 +239,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "geometric-planter",
+    tags: ["Home & Decor"],
     name: "Square Planter",
     tagline: "Clean tapered pot for succulents & herbs.",
     description:
@@ -217,6 +255,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "dice-tower",
+    tags: ["Tabletop & Games"],
     name: "Dice Tower",
     tagline: "Fair rolls, no table-launched d20s.",
     description:
@@ -232,6 +271,7 @@ export const PRINTS: Print[] = [
   },
   {
     id: "custom-nameplate",
+    tags: ["Desk & Office", "Personalized"],
     name: "Custom Desk Nameplate",
     tagline: "Your name (or handle) in 3D.",
     description:

@@ -1,9 +1,18 @@
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import CustomPrint from "./CustomPrint";
 import Logo from "./Logo";
-import { PRINTS, sizeOptions, type Print } from "../lib/prints";
+import {
+  PRINTS,
+  sizeOptions,
+  catalogCategories,
+  catalogMaterials,
+  priceValue,
+  type Print,
+} from "../lib/prints";
+
+type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
 // Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
 const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
@@ -16,6 +25,44 @@ const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
 export default function Shop() {
   const live = PRINTS.filter((p) => p.stripeLink && !p.soldOut).length;
   const [viewing, setViewing] = useState<Print | null>(null);
+
+  // Filter / search state — a normal storefront browse experience.
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
+  const [material, setMaterial] = useState("All");
+  const [sort, setSort] = useState<SortKey>("featured");
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  const categories = catalogCategories();
+  const materials = catalogMaterials();
+
+  const results = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    let list = PRINTS.filter((p) => {
+      if (category !== "All" && !(p.tags ?? []).includes(category)) return false;
+      if (material !== "All" && p.material !== material) return false;
+      if (inStockOnly && (!p.stripeLink || p.soldOut)) return false;
+      if (needle) {
+        const hay = `${p.name} ${p.tagline} ${p.description} ${(p.tags ?? []).join(" ")} ${p.material}`.toLowerCase();
+        if (!hay.includes(needle)) return false;
+      }
+      return true;
+    });
+    if (sort === "price-asc") list = [...list].sort((a, b) => priceValue(a) - priceValue(b));
+    else if (sort === "price-desc") list = [...list].sort((a, b) => priceValue(b) - priceValue(a));
+    else if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    return list;
+  }, [query, category, material, sort, inStockOnly]);
+
+  const filtersActive =
+    query.trim() !== "" || category !== "All" || material !== "All" || inStockOnly || sort !== "featured";
+  const resetFilters = () => {
+    setQuery("");
+    setCategory("All");
+    setMaterial("All");
+    setSort("featured");
+    setInStockOnly(false);
+  };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -42,18 +89,131 @@ export default function Shop() {
           </p>
         </Reveal>
 
+        {/* Filter / search bar */}
+        <Reveal delay={0.05}>
+          <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4 md:p-5">
+            {/* Search + sort row */}
+            <div className="flex flex-col md:flex-row gap-3 md:items-center">
+              <div className="relative flex-1">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M21 21l-4.3-4.3" strokeLinecap="round" />
+                </svg>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search prints…"
+                  aria-label="Search prints"
+                  className="w-full bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 text-xs text-neutral-400 select-none cursor-pointer whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="accent-accent h-4 w-4"
+                  />
+                  In stock
+                </label>
+                <select
+                  value={material}
+                  onChange={(e) => setMaterial(e.target.value)}
+                  aria-label="Filter by material"
+                  className="bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
+                >
+                  <option value="All">All materials</option>
+                  {materials.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortKey)}
+                  aria-label="Sort prints"
+                  className="bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
+                >
+                  <option value="featured">Featured</option>
+                  <option value="price-asc">Price: low to high</option>
+                  <option value="price-desc">Price: high to low</option>
+                  <option value="name">Name: A–Z</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Category pills */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {["All", ...categories].map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCategory(c)}
+                  aria-pressed={category === c}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                    category === c
+                      ? "bg-accent text-white border-accent"
+                      : "bg-neutral-950/40 text-neutral-400 border-neutral-800 hover:border-neutral-600"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Result count + clear */}
+        <div className="mt-6 flex items-center justify-between text-sm text-neutral-500">
+          <span>
+            {results.length} {results.length === 1 ? "print" : "prints"}
+            {filtersActive ? " match your filters" : ""}
+          </span>
+          {filtersActive && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="text-accent hover:underline"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
           style={{ perspective: "1500px" }}
         >
-          {PRINTS.map((p, i) => (
-            <Reveal key={p.id} delay={i * 0.08}>
+          {results.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.05}>
               <Weighted tilt={4} lift={12} className="h-full">
                 <PrintCard print={p} onView={p.model ? () => setViewing(p) : undefined} />
               </Weighted>
             </Reveal>
           ))}
         </div>
+
+        {results.length === 0 && (
+          <Reveal delay={0.1}>
+            <div className="mt-10 text-center">
+              <p className="text-neutral-400">No prints match your search.</p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-3 text-sm text-accent hover:underline"
+              >
+                Clear filters
+              </button>
+            </div>
+          </Reveal>
+        )}
 
         {live === 0 && (
           <Reveal delay={0.1}>
