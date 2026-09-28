@@ -108,6 +108,22 @@ export const PRINTS: Print[] = [
     badge: "New",
   },
   {
+    id: "halloween-witch-dog",
+    name: "Witchy Wiener Dog",
+    tagline: "Dachshund in a witch hat — full Halloween charm.",
+    description:
+      "A chibi dachshund decked out for Halloween — striped witch hat, ghost costume, and a tiny trick-or-treat pumpkin. A cute seasonal desk piece; printed in full color. Made to order; pick your size.",
+    price: "$24",
+    image: "/prints/halloween-witch-dog.webp",
+    model: "/models/shop/halloween-witch-dog.glb",
+    modelColor: "e8e4dc",
+    material: "PLA",
+    size: "150 × 60 × 90 mm",
+    leadTime: "Made to order · ships in 3–5 days",
+    stripeLink: "",
+    badge: "Halloween",
+  },
+  {
     id: "articulated-dragon",
     name: "Winged Dragon",
     tagline: "Detailed winged dragon centerpiece.",
