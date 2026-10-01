@@ -36,7 +36,20 @@ export type Print = {
   soldOut?: boolean;
   /** Category tags for the shop's filter bar (e.g. ["Halloween", "Home & Decor"]). */
   tags?: string[];
+  /** When set, the card sells by QUANTITY (pick how many) with bulk pricing
+   *  instead of S/M/L sizes. See `packTotal`. */
+  pack?: Pack;
 };
+
+/** Quantity-pack pricing: `unit` dollars each, with `off` dollars off the total
+ *  for every `per` units bought (e.g. $2 each, $0.50 off per 5). */
+export type Pack = { unit: number; per: number; off: number };
+
+/** Total price for `qty` units under a pack's bulk-discount rule. */
+export function packTotal(pack: Pack, qty: number): number {
+  const q = Math.max(1, Math.floor(qty || 1));
+  return Math.max(0, q * pack.unit - Math.floor(q / pack.per) * pack.off);
+}
 
 // Category order for the filter bar. Products carry `tags` from this set; the bar
 // shows "All" + these (only the ones actually used appear).
@@ -154,6 +167,22 @@ export const PRINTS: Print[] = [
     leadTime: "Made to order · ships in 3–5 days",
     stripeLink: "",
     badge: "Halloween",
+  },
+  {
+    id: "halloween-cute-ghost",
+    tags: ["Halloween", "Home & Decor"],
+    name: "Cute Ghost",
+    tagline: "Tiny smiling ghost — buy as many as you want.",
+    description:
+      "A little smiling ghost, about an inch tall — the perfect spooky-cute desk buddy, shelf companion, or party favor. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Made to order; pick your color.",
+    price: "$2",
+    image: "/prints/halloween-cute-ghost.webp",
+    material: "PLA",
+    size: "~17 × 17 × 24 mm each",
+    leadTime: "Made to order · ships in 3–5 days",
+    stripeLink: "",
+    badge: "Halloween",
+    pack: { unit: 2, per: 5, off: 0.5 },
   },
   {
     id: "articulated-dragon",

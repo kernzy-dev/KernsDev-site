@@ -9,6 +9,7 @@ import {
   catalogCategories,
   catalogMaterials,
   priceValue,
+  packTotal,
   type Print,
 } from "../lib/prints";
 
@@ -273,10 +274,16 @@ function safeHref(u: string): string {
 }
 
 function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) {
+  const pack = p.pack;
   const sizes = sizeOptions(p);
   const [size, setSize] = useState(sizes[0]);
-  // Only "buyable" if the SELECTED size has a link, in stock, AND a safe scheme.
-  const buyable = !p.soldOut && !!safeHref(size.stripeLink);
+  const [qty, setQty] = useState(5);
+  const packSum = pack ? packTotal(pack, qty) : 0;
+  const savings = pack ? qty * pack.unit - packSum : 0;
+  const priceLabel = pack ? `$${packSum.toFixed(2)}` : size.price;
+  // Pack products check out via the single-unit stripeLink; sized products via the size link.
+  const activeLink = pack ? p.stripeLink : size.stripeLink;
+  const buyable = !p.soldOut && !!safeHref(activeLink);
   return (
     <article className="group relative bg-gradient-to-br from-neutral-900/60 to-neutral-900/20 border border-neutral-800 hover:border-accent/40 rounded-2xl overflow-hidden transition-colors h-full flex flex-col">
       {/* Image (gradient fallback if the file is missing) */}
@@ -334,50 +341,99 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-xl font-display font-bold">{p.name}</h3>
-          <span className="text-lg font-semibold text-neutral-100 whitespace-nowrap">{size.price}</span>
+          <span className="text-lg font-semibold text-neutral-100 whitespace-nowrap">{priceLabel}</span>
         </div>
         <p className="text-sm text-neutral-300 font-medium mt-1">{p.tagline}</p>
         <p className="text-sm text-neutral-400 leading-relaxed mt-3">{p.description}</p>
 
-        {/* Size selector — S / M / L, scales dimensions + price */}
-        <div className="mt-4 flex gap-1.5" role="group" aria-label="Choose a size">
-          {sizes.map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => setSize(s)}
-              aria-pressed={size.key === s.key}
-              title={`${s.name} — ${s.dims}`}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-md border transition-colors ${
-                size.key === s.key
-                  ? "bg-accent text-white border-accent"
-                  : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
-              }`}
-            >
-              {s.key}
-            </button>
-          ))}
-        </div>
+        {pack ? (
+          /* Quantity selector with bulk pricing (buy as many as you want) */
+          <div className="mt-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-neutral-500">Quantity</span>
+              <div className="flex items-center border border-neutral-800 rounded-md overflow-hidden">
+                <button
+                  type="button"
+                  aria-label="Fewer"
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors"
+                >
+                  −
+                </button>
+                <span className="px-4 py-1.5 text-sm tabular-nums min-w-[2.5rem] text-center text-neutral-100">{qty}</span>
+                <button
+                  type="button"
+                  aria-label="More"
+                  onClick={() => setQty((q) => Math.min(99, q + 1))}
+                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[1, 5, 10, 15].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setQty(n)}
+                  aria-pressed={qty === n}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                    qty === n
+                      ? "bg-accent text-white border-accent"
+                      : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
+                  }`}
+                >
+                  {n === 1 ? "Single" : `${n}-pack`}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-neutral-500 mt-2">
+              ${pack.unit.toFixed(2)} each · ${pack.off.toFixed(2)} off every {pack.per}
+              {savings > 0 && <span className="text-accent"> — you save ${savings.toFixed(2)}</span>}
+            </p>
+          </div>
+        ) : (
+          /* Size selector — S / M / L, scales dimensions + price */
+          <div className="mt-4 flex gap-1.5" role="group" aria-label="Choose a size">
+            {sizes.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setSize(s)}
+                aria-pressed={size.key === s.key}
+                title={`${s.name} — ${s.dims}`}
+                className={`flex-1 text-xs font-medium py-1.5 rounded-md border transition-colors ${
+                  size.key === s.key
+                    ? "bg-accent text-white border-accent"
+                    : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
+                }`}
+              >
+                {s.key}
+              </button>
+            ))}
+          </div>
+        )}
 
         <dl className="text-xs text-neutral-500 mt-3 space-y-0.5">
           <div><span className="text-neutral-600">Material:</span> {p.material}</div>
-          <div><span className="text-neutral-600">{size.name} size:</span> {size.dims}</div>
+          <div><span className="text-neutral-600">{pack ? "Size:" : `${size.name} size:`}</span> {pack ? p.size : size.dims}</div>
           {p.leadTime && <div>{p.leadTime}</div>}
         </dl>
 
         <div className="mt-auto pt-5">
           {buyable ? (
             <a
-              href={safeHref(size.stripeLink)}
+              href={safeHref(activeLink)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary text-sm w-full text-center"
             >
-              Buy {size.name} — {size.price}
+              {pack ? `Buy ${qty} — ${priceLabel}` : `Buy ${size.name} — ${size.price}`}
             </a>
           ) : (
             <span className="inline-flex w-full justify-center text-sm border border-neutral-800 text-neutral-500 px-4 py-2 rounded-md cursor-not-allowed">
-              {p.soldOut ? "Sold out" : `${size.name} — coming soon`}
+              {p.soldOut ? "Sold out" : pack ? "Coming soon" : `${size.name} — coming soon`}
             </span>
           )}
         </div>
