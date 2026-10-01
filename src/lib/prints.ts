@@ -171,10 +171,10 @@ export const PRINTS: Print[] = [
   {
     id: "halloween-cute-ghost",
     tags: ["Halloween", "Home & Decor"],
-    name: "Cute Ghost",
-    tagline: "Tiny smiling ghost — buy as many as you want.",
+    name: "Cozy Ghost",
+    tagline: "Bundled-up ghost with a latte & a jack-o'-lantern.",
     description:
-      "A little smiling ghost, about an inch tall — the perfect spooky-cute desk buddy, shelf companion, or party favor. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Made to order; pick your color.",
+      "A spooky-cute little ghost all bundled up for fall — pom-pom beanie, a pumpkin-spice latte in one hand and a tiny carved jack-o'-lantern in the other. About an inch tall; the perfect desk buddy, shelf companion, or party favor. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Made to order; pick your color.",
     price: "$2",
     image: "/prints/halloween-cute-ghost.webp",
     material: "PLA",
