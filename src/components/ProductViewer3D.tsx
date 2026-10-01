@@ -12,7 +12,7 @@ function Model({ url, color }: { url: string; color?: string }) {
   // mesh the product's filament color + soft matte finish.
   const model = useMemo(() => {
     const c = scene.clone(true);
-    const mat = new THREE.MeshStandardMaterial({
+    const flat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(`#${color || "b8b8c2"}`),
       roughness: 0.55,
       metalness: 0.04,
@@ -22,7 +22,12 @@ function Model({ url, color }: { url: string; color?: string }) {
       if (m.isMesh) {
         m.castShadow = true;
         m.receiveShadow = true;
-        m.material = mat;
+        // Keep the model's own TEXTURED material when it has one so the viewer
+        // shows the real colors. Only fall back to the flat filament color for
+        // geometry-only models (no texture) — otherwise they'd render as one
+        // solid color (the old "all orange cat" / flat-cream dog bug).
+        const textured = !!(m.material && (m.material as THREE.MeshStandardMaterial).map);
+        if (!textured) m.material = flat;
         // Decimation/export can drop normals — without them the mesh renders
         // unlit (black). Recompute so the lighting reads.
         if (!m.geometry.getAttribute("normal")) m.geometry.computeVertexNormals();
