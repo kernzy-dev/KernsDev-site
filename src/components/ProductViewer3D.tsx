@@ -23,11 +23,21 @@ function Model({ url, color }: { url: string; color?: string }) {
         m.castShadow = true;
         m.receiveShadow = true;
         // Keep the model's own TEXTURED material when it has one so the viewer
-        // shows the real colors. Only fall back to the flat filament color for
-        // geometry-only models (no texture) — otherwise they'd render as one
-        // solid color (the old "all orange cat" / flat-cream dog bug).
+        // shows the real colors. Honor baked VERTEX COLORS too (multi-filament
+        // models like the painted ghost store color per-vertex, not as a texture).
+        // Only fall back to the flat filament color for plain geometry-only models
+        // (the old "all orange cat" / flat-cream dog bug).
         const textured = !!(m.material && (m.material as THREE.MeshStandardMaterial).map);
-        if (!textured) m.material = flat;
+        const hasVertexColors = !!m.geometry.getAttribute("color");
+        if (hasVertexColors) {
+          m.material = new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            roughness: 0.55,
+            metalness: 0.04,
+          });
+        } else if (!textured) {
+          m.material = flat;
+        }
         // Decimation/export can drop normals — without them the mesh renders
         // unlit (black). Recompute so the lighting reads.
         if (!m.geometry.getAttribute("normal")) m.geometry.computeVertexNormals();

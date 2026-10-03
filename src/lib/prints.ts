@@ -177,6 +177,7 @@ export const PRINTS: Print[] = [
       "A spooky-cute little ghost all bundled up for fall — pom-pom beanie, a pumpkin-spice latte in one hand and a tiny carved jack-o'-lantern in the other. About an inch tall; the perfect desk buddy, shelf companion, or party favor. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Made to order; pick your color.",
     price: "$2",
     image: "/prints/halloween-cute-ghost.webp",
+    model: "/models/shop/halloween-cute-ghost.glb",
     material: "PLA",
     size: "~17 × 17 × 24 mm each",
     leadTime: "Made to order · ships in 3–5 days",
