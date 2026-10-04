@@ -3,6 +3,9 @@ import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import CustomPrint from "./CustomPrint";
 import Logo from "./Logo";
+import ThreeErrorBoundary from "./three/ThreeErrorBoundary";
+import useReducedMotion from "../hooks/useReducedMotion";
+import { hasWebGL } from "../lib/webgl";
 import {
   PRINTS,
   sizeOptions,
@@ -77,6 +80,10 @@ type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 // Heavy three.js viewer — only pulled in when a customer opens a 360° preview.
 const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
 
+// Signature "print-in" hero scene — its own chunk (R3F/Three/postprocessing),
+// only fetched when WebGL is present on a wide-enough viewport.
+const PrintInHero = lazy(() => import("./shop/PrintInHero"));
+
 /**
  * /shop — 3D-print storefront. Physical prints, checkout via Stripe Payment
  * Links (each product's `stripeLink`). Standalone page (own route in App.tsx),
@@ -86,6 +93,20 @@ export default function Shop() {
   useShopSeo();
   const live = PRINTS.filter((p) => p.stripeLink && !p.soldOut).length;
   const [viewing, setViewing] = useState<Print | null>(null);
+
+  // Signature 3D hero: mounts wherever WebGL is available — phones included
+  // (most of the shop's traffic), tiered down for performance on small screens.
+  // No-WebGL devices get the static header; reduced-motion shows the finished
+  // model without the print-in sweep or turntable.
+  const reduced = useReducedMotion();
+  const [heroOn, setHeroOn] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    if (hasWebGL()) {
+      setMobile(window.innerWidth < 640);
+      setHeroOn(true);
+    }
+  }, []);
 
   // Filter / search state — a normal storefront browse experience.
   const [query, setQuery] = useState("");
@@ -138,19 +159,44 @@ export default function Shop() {
       </header>
 
       <main className="container-tight py-16 md:py-24">
-        <Reveal>
-          <p className="section-eyebrow mb-2">3D Print Shop</p>
-          <h1 className="text-4xl md:text-5xl font-bold font-display max-w-2xl">
-            3D Printed Decor, Figurines &amp; Gifts — Made to Order
-          </h1>
-          <p className="text-neutral-400 mt-4 max-w-xl">
-            Original 3D printed decor, figurines, and gifts — Halloween and Christmas
-            pieces, desk accessories, planters, and more — printed to order on a
-            Bambu Lab X2D in durable PLA and PETG. Pick a color at checkout; each
-            piece is handmade in Somerset, KY and shipped to you within a few days.
-            Secure checkout is handled by Stripe.
-          </p>
-        </Reveal>
+        <div className="relative isolate flex flex-col justify-center min-h-[clamp(380px,56vh,560px)]">
+          {/* Signature print-in 3D backdrop — full-bleed behind the header copy.
+              Decorative only (aria-hidden) + pointer-events-none so the real
+              heading text below stays crawlable and links stay clickable. */}
+          {heroOn && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 -z-10"
+            >
+              <ThreeErrorBoundary fallback={null}>
+                <Suspense fallback={null}>
+                  <PrintInHero animate={!reduced} mobile={mobile} />
+                </Suspense>
+              </ThreeErrorBoundary>
+              {/* Legibility scrim so the copy reads over the scene. */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 72% 82% at 50% 45%, rgba(10,10,12,0) 0%, rgba(10,10,12,0.38) 58%, rgba(10,10,12,0.86) 100%)",
+                }}
+              />
+            </div>
+          )}
+          <Reveal>
+            <p className="section-eyebrow mb-2">3D Print Shop</p>
+            <h1 className="text-4xl md:text-5xl font-bold font-display max-w-2xl">
+              3D Printed Decor, Figurines &amp; Gifts — Made to Order
+            </h1>
+            <p className="text-neutral-400 mt-4 max-w-xl">
+              Original 3D printed decor, figurines, and gifts — Halloween and Christmas
+              pieces, desk accessories, planters, and more — printed to order on a
+              Bambu Lab X2D in durable PLA and PETG. Pick a color at checkout; each
+              piece is handmade in Somerset, KY and shipped to you within a few days.
+              Secure checkout is handled by Stripe.
+            </p>
+          </Reveal>
+        </div>
 
         {/* Filter / search bar */}
         <Reveal delay={0.05}>
