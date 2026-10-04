@@ -1,4 +1,4 @@
-import { Suspense, lazy, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import Reveal from "./motion/Reveal";
 import Weighted from "./motion/Weighted";
 import CustomPrint from "./CustomPrint";
@@ -10,8 +10,67 @@ import {
   catalogMaterials,
   priceValue,
   packTotal,
+  shopProductsJsonLd,
+  SHOP_URL,
   type Print,
 } from "../lib/prints";
+
+// SEO chrome for the storefront route. No SSR here, so the shop-specific
+// <title>, meta description, canonical, and Product JSON-LD are applied
+// client-side (Googlebot renders JS) and restored when leaving the route —
+// this keeps index.html's AI-consulting defaults intact for every other page.
+const SHOP_TITLE =
+  "3D Printed Decor, Figurines & Gifts — Made to Order | KernsDev (Somerset, KY)";
+const SHOP_DESC =
+  "Shop handmade 3D printed decor, figurines, and gifts from KernsDev in Somerset, KY — Halloween and Christmas decor, desk accessories, planters, dice towers, and custom prints. Made to order in durable PLA/PETG and shipped nationwide.";
+
+function useShopSeo() {
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = SHOP_TITLE;
+
+    const descEl = document.querySelector('meta[name="description"]');
+    const prevDesc = descEl?.getAttribute("content") ?? null;
+    descEl?.setAttribute("content", SHOP_DESC);
+
+    const canonEl = document.querySelector('link[rel="canonical"]');
+    const prevCanon = canonEl?.getAttribute("href") ?? null;
+    canonEl?.setAttribute("href", SHOP_URL);
+
+    const ld = document.createElement("script");
+    ld.type = "application/ld+json";
+    ld.setAttribute("data-shop-ld", "");
+    ld.textContent = JSON.stringify(shopProductsJsonLd());
+    document.head.appendChild(ld);
+
+    return () => {
+      document.title = prevTitle;
+      if (descEl && prevDesc !== null) descEl.setAttribute("content", prevDesc);
+      if (canonEl && prevCanon !== null) canonEl.setAttribute("href", prevCanon);
+      ld.remove();
+    };
+  }, []);
+}
+
+// Descriptive, keyworded alt text derived from the product — good for image
+// search and accessibility (e.g. "Cozy Ghost — 3D printed Halloween decor in
+// PLA"). Falls back gracefully when a product has no themed/category tag.
+function imageAlt(p: Print): string {
+  const occasion = (p.tags ?? []).find(
+    (t) => t === "Halloween" || t === "Christmas",
+  );
+  const tags = p.tags ?? [];
+  const kind = tags.includes("Desk & Office")
+    ? "desk accessory"
+    : tags.includes("Tabletop & Games")
+      ? "tabletop piece"
+      : tags.includes("Toys & Fidgets")
+        ? "fidget toy"
+        : tags.includes("Personalized")
+          ? "personalized gift"
+          : "decor";
+  return `${p.name} — 3D printed ${occasion ? occasion + " " : ""}${kind} in ${p.material}, by KernsDev`;
+}
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -24,6 +83,7 @@ const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
  * styled to match the landing page's design system.
  */
 export default function Shop() {
+  useShopSeo();
   const live = PRINTS.filter((p) => p.stripeLink && !p.soldOut).length;
   const [viewing, setViewing] = useState<Print | null>(null);
 
@@ -79,13 +139,15 @@ export default function Shop() {
 
       <main className="container-tight py-16 md:py-24">
         <Reveal>
-          <p className="section-eyebrow mb-2">3D Prints</p>
+          <p className="section-eyebrow mb-2">3D Print Shop</p>
           <h1 className="text-4xl md:text-5xl font-bold font-display max-w-2xl">
-            Printed to order, shipped to you.
+            3D Printed Decor, Figurines &amp; Gifts — Made to Order
           </h1>
           <p className="text-neutral-400 mt-4 max-w-xl">
-            Designs I print on a Bambu Lab X2D in durable PLA/PETG. Pick a color at
-            checkout; each piece is made to order and shipped within a few days.
+            Original 3D printed decor, figurines, and gifts — Halloween and Christmas
+            pieces, desk accessories, planters, and more — printed to order on a
+            Bambu Lab X2D in durable PLA and PETG. Pick a color at checkout; each
+            piece is handmade in Somerset, KY and shipped to you within a few days.
             Secure checkout is handled by Stripe.
           </p>
         </Reveal>
@@ -317,12 +379,13 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
             loop
             playsInline
             preload="metadata"
+            aria-label={imageAlt(p)}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : p.image ? (
           <img
             src={p.image}
-            alt={p.name}
+            alt={imageAlt(p)}
             loading="lazy"
             decoding="async"
             onError={(e) => {

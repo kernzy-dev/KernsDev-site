@@ -122,9 +122,9 @@ export const PRINTS: Print[] = [
     id: "halloween-pumpkin-cat",
     tags: ["Halloween", "Home & Decor"],
     name: "Jack-o'-Lantern Kitty",
-    tagline: "Chibi cat peeking from a carved pumpkin.",
+    tagline: "3D printed chibi cat peeking from a carved pumpkin.",
     description:
-      "A chibi kitty tucked into a carved jack-o'-lantern — a cute seasonal desk piece or Halloween gift. Made to order; pick your colors.",
+      "A chibi kitty tucked into a carved jack-o'-lantern — a cute piece of 3D printed Halloween decor for a desk, shelf, or tiered tray, and a fun seasonal gift. Handmade to order in PLA; pick your custom colors.",
     price: "$22",
     image: "/prints/halloween-pumpkin-cat.webp",
     model: "/models/shop/halloween-pumpkin-cat.glb",
@@ -139,9 +139,9 @@ export const PRINTS: Print[] = [
     id: "neutral-pumpkin",
     tags: ["Halloween", "Home & Decor"],
     name: "Ridged Pumpkin",
-    tagline: "Minimalist ridged pumpkin — neutral fall decor.",
+    tagline: "Minimalist ridged 3D printed pumpkin — neutral fall decor.",
     description:
-      "A clean, ridged decorative pumpkin in a minimalist neutral style — modern farmhouse fall & Halloween decor. Made to order; pick your size and color. Large fills the full print bed for a real statement piece.",
+      "A clean, ridged decorative pumpkin in a minimalist neutral style — 3D printed modern-farmhouse fall and Halloween decor for a mantel, shelf, or tiered tray. Handmade to order in PLA; pick your size and color. Large fills the full print bed for a real statement piece.",
     price: "$28",
     image: "/prints/neutral-pumpkin.webp",
     model: "/models/shop/neutral-pumpkin.glb",
@@ -158,7 +158,7 @@ export const PRINTS: Print[] = [
     name: "Witchy Wiener Dog",
     tagline: "Dachshund in a witch hat — full Halloween charm.",
     description:
-      "A chibi dachshund decked out for Halloween — striped witch hat, ghost costume, and a tiny trick-or-treat pumpkin. A cute seasonal desk piece; printed in full color. Made to order; pick your size.",
+      "A chibi dachshund decked out for Halloween — striped witch hat, ghost costume, and a tiny trick-or-treat pumpkin. A cute piece of 3D printed Halloween desk decor or shelf sitter, and a fun gift for dog lovers; printed in full color. Handmade to order in PLA; pick your size.",
     price: "$24",
     image: "/prints/halloween-witch-dog.webp",
     model: "/models/shop/halloween-witch-dog.glb",
@@ -175,7 +175,7 @@ export const PRINTS: Print[] = [
     name: "Cozy Ghost",
     tagline: "Bundled-up ghost with a latte & a jack-o'-lantern.",
     description:
-      "A spooky-cute little ghost all bundled up for fall — pom-pom beanie, a pumpkin-spice latte in one hand and a tiny carved jack-o'-lantern in the other. About an inch tall; the perfect desk buddy, shelf companion, or party favor. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Made to order; pick your color.",
+      "A spooky-cute little 3D printed ghost all bundled up for fall — pom-pom beanie, a pumpkin-spice latte in one hand and a tiny carved jack-o'-lantern in the other. About an inch tall; the perfect Halloween desk decor, shelf companion, party favor, or stocking stuffer. Build a whole gang: pick how many you want, and every 5 you add knocks the price down. Handmade to order in PLA; pick your color.",
     price: "$2",
     image: "/prints/halloween-cute-ghost.webp",
     model: "/models/shop/halloween-cute-ghost.glb",
@@ -192,7 +192,7 @@ export const PRINTS: Print[] = [
     name: "Nordic Gnome Tealight",
     tagline: "Carved gnome lantern that glows from within.",
     description:
-      "A cozy Scandinavian gnome with an intricately carved, curling hat — drop in a flameless tealight and warm light spills through the filigree body. A charming mantel, shelf, or windowsill piece for the holidays. Made to order; pick your color.",
+      "A cozy Scandinavian gnome with an intricately carved, curling hat — drop in a flameless tealight and warm light spills through the filigree body. A charming 3D printed mantel, shelf, or windowsill piece of Christmas and holiday decor. Handmade to order in PLA; pick your color.",
     price: "$24",
     image: "/prints/christmas-gnome-tealight.webp",
     material: "PLA",
@@ -207,7 +207,7 @@ export const PRINTS: Print[] = [
     name: "Reindeer Candle Holder",
     tagline: "Red-nosed reindeer cradling a jar candle.",
     description:
-      "A cheerful red-nosed reindeer holding a tray on its antlers, sized for a standard jar candle (candle not included). A sweet, sturdy centerpiece for the holiday table or entryway. Made to order; pick your color.",
+      "A cheerful red-nosed reindeer holding a tray on its antlers, sized for a standard jar candle (candle not included). A sweet, sturdy 3D printed centerpiece for the holiday table, mantel, or entryway — and a cozy Christmas gift. Handmade to order in PLA; pick your color.",
     price: "$25",
     image: "/prints/christmas-reindeer-candle.webp",
     material: "PLA",
@@ -222,7 +222,7 @@ export const PRINTS: Print[] = [
     name: "Standing Stag",
     tagline: "Elegant full-antler stag statement piece.",
     description:
-      "A graceful standing stag with full sweeping antlers — a clean, modern-farmhouse statement piece for a mantel or console. Prints large and reads beautifully in matte white or any single color. Made to order; pick your size and color.",
+      "A graceful standing stag with full sweeping antlers — a clean, modern-farmhouse 3D printed statement piece for a mantel or console. Prints large and reads beautifully in matte white or any single color — elegant Christmas and winter decor. Handmade to order in PLA; pick your size and color.",
     price: "$28",
     image: "/prints/christmas-mega-reindeer.webp",
     material: "PLA",
@@ -237,7 +237,7 @@ export const PRINTS: Print[] = [
     name: "Standing Reindeer Trio",
     tagline: "Set of three minimalist shelf reindeer.",
     description:
-      "A set of three slender, minimalist standing reindeer in graduated sizes — an elegant little herd for a shelf, mantel, or holiday tablescape. Clean matte finish; looks great as a set. Made to order; pick your color.",
+      "A set of three slender, minimalist standing reindeer in graduated sizes — an elegant little 3D printed herd for a shelf, mantel, or holiday tablescape. Clean matte finish; looks great as a set and makes a lovely Christmas gift. Handmade to order in PLA; pick your color.",
     price: "$18",
     image: "/prints/christmas-reindeer-trio.webp",
     material: "PLA",
@@ -252,7 +252,7 @@ export const PRINTS: Print[] = [
     name: "Cheery Snowman",
     tagline: "Top hat, scarf & carrot nose.",
     description:
-      "A plump, happy little snowman all bundled up in a scarf and top hat, with a carrot nose and coal-button smile. A cozy desk, shelf, or mantel piece for the whole winter season. Made to order; pick your color.",
+      "A plump, happy little 3D printed snowman all bundled up in a scarf and top hat, with a carrot nose and coal-button smile. Cozy Christmas and winter decor for a desk, shelf, or mantel — and a sweet stocking stuffer. Handmade to order in PLA; pick your color.",
     price: "$12",
     image: "/prints/christmas-snowman.webp",
     material: "PLA",
@@ -267,7 +267,7 @@ export const PRINTS: Print[] = [
     name: "Decorated Christmas Tree",
     tagline: "Stylized tree with a gold star & baubles.",
     description:
-      "A charming stylized Christmas tree topped with a gold star, trimmed with garland and ornaments. A clean, modern little centerpiece for a desk, shelf, or holiday tablescape. Made to order; pick your size and colors.",
+      "A charming stylized 3D printed Christmas tree topped with a gold star, trimmed with garland and ornaments. A clean, modern little centerpiece and festive Christmas decor for a desk, shelf, or holiday tablescape — also a small gift. Handmade to order in PLA; pick your size and colors.",
     price: "$16",
     image: "/prints/christmas-tree.webp",
     material: "PLA",
@@ -282,7 +282,7 @@ export const PRINTS: Print[] = [
     name: "Jolly Santa",
     tagline: "Chibi Santa with his sack of gifts.",
     description:
-      "A rosy-cheeked, chibi-style Santa Claus with his gift sack and a wrapped present — a cheerful desk buddy or shelf decoration for the holidays. Made to order; pick your color.",
+      "A rosy-cheeked, chibi-style 3D printed Santa Claus with his gift sack and a wrapped present — cheerful Christmas decor and a desk buddy, shelf sitter, or stocking stuffer for the holidays. Handmade to order in PLA; pick your color.",
     price: "$14",
     image: "/prints/christmas-santa.webp",
     material: "PLA",
@@ -297,7 +297,7 @@ export const PRINTS: Print[] = [
     name: "Gingerbread Man",
     tagline: "Iced gingerbread cookie ornament.",
     description:
-      "A classic smiling gingerbread man with piped-icing trim — great as a hanging ornament, gift topper, or little shelf friend. Prints flat and quick; add a loop of twine to hang. Made to order; pick your colors.",
+      "A classic smiling 3D printed gingerbread man with piped-icing trim — great as a hanging Christmas ornament, gift topper, or little shelf friend. Prints flat and quick; add a loop of twine to hang. Handmade to order in PLA; pick your colors.",
     price: "$9",
     image: "/prints/christmas-gingerbread.webp",
     material: "PLA",
@@ -310,9 +310,9 @@ export const PRINTS: Print[] = [
     id: "articulated-dragon",
     tags: ["Tabletop & Games", "Home & Decor"],
     name: "Winged Dragon",
-    tagline: "Detailed winged dragon centerpiece.",
+    tagline: "Detailed 3D printed winged dragon centerpiece.",
     description:
-      "A striking winged dragon, poised with wings raised — a clean display piece for a shelf, desk, or D&D table. Printed in one solid color or finished in a metallic filament.",
+      "A striking 3D printed winged dragon, poised with wings raised — a clean display piece and collectible for a shelf, desk, or D&D tabletop, and a great gift for fantasy fans. Printed in one solid color or finished in a metallic filament.",
     price: "$28",
     image: "/prints/articulated-dragon.webp",
     model: "/models/shop/articulated-dragon.glb",
@@ -327,9 +327,9 @@ export const PRINTS: Print[] = [
     id: "articulated-axolotl",
     tags: ["Toys & Fidgets"],
     name: "Articulated Slug",
-    tagline: "Squishy, wiggly print-in-place fidget.",
+    tagline: "Squishy, wiggly 3D printed print-in-place fidget.",
     description:
-      "A fully articulated slug with a satisfying wiggle — printed in one piece, no assembly. A goofy, tactile desk buddy. Great in silk pastels or a two-tone body.",
+      "A fully articulated 3D printed slug with a satisfying wiggle — printed in one piece, no assembly. A goofy, tactile desk toy and fidget gift. Great in silk pastel PLA or a two-tone body.",
     price: "$16",
     image: "/prints/articulated-axolotl.webp",
     model: "/models/shop/articulated-axolotl.glb",
@@ -346,7 +346,7 @@ export const PRINTS: Print[] = [
     name: "Modular Desk Organizer",
     tagline: "Gridfinity bins for pens, cables & bits.",
     description:
-      "A stackable, modular tray system that keeps your desk tidy — pens, cables, USB sticks, small parts. Mix and match bin sizes to fit your setup.",
+      "A stackable, modular 3D printed tray system that keeps your desk tidy — pens, cables, USB sticks, small parts. A Gridfinity-compatible desk organizer; mix and match bin sizes to fit your setup.",
     price: "$19",
     image: "/prints/desk-organizer.webp",
     model: "/models/shop/desk-organizer.glb",
@@ -362,7 +362,7 @@ export const PRINTS: Print[] = [
     name: "Minimalist Phone Stand",
     tagline: "Desk, nightstand, kitchen counter.",
     description:
-      "A clean, low-profile stand that props up your phone at a comfortable viewing angle — simple, sturdy, and out of the way. Pick your color to match the desk.",
+      "A clean, low-profile 3D printed phone stand that props up your phone at a comfortable viewing angle — simple, sturdy desk, nightstand, or kitchen-counter accessory that stays out of the way. Pick your color to match the desk.",
     price: "$14",
     image: "/prints/phone-tablet-stand.webp",
     model: "/models/shop/phone-tablet-stand.glb",
@@ -378,7 +378,7 @@ export const PRINTS: Print[] = [
     name: "Headphone Stand",
     tagline: "Clears the desk, shows off the cans.",
     description:
-      "A clean, weighted headphone stand that keeps your headset off the desk and cable-tidy. A crisp accent piece for any battlestation.",
+      "A clean, weighted 3D printed headphone stand that keeps your headset off the desk and cable-tidy. A crisp desk accent and gift for any gaming battlestation setup.",
     price: "$24",
     image: "/prints/headphone-stand.webp",
     model: "/models/shop/headphone-stand.glb",
@@ -394,7 +394,7 @@ export const PRINTS: Print[] = [
     name: "Square Planter",
     tagline: "Clean tapered pot for succulents & herbs.",
     description:
-      "A crisp square planter with drainage for succulents, herbs, and small plants. Simple modern lines; pick your color to match the room.",
+      "A crisp square 3D printed planter with drainage for succulents, herbs, and small plants. Simple modern lines for desk, shelf, or windowsill decor; pick your color to match the room.",
     price: "$18",
     image: "/prints/geometric-planter.webp",
     model: "/models/shop/geometric-planter.glb",
@@ -410,7 +410,7 @@ export const PRINTS: Print[] = [
     name: "Dice Tower",
     tagline: "Fair rolls, no table-launched d20s.",
     description:
-      "A spiral dice tower for board-game and TTRPG night — internal zig-zag ramps tumble dice for a genuinely fair roll into the catch tray. Custom colors welcome.",
+      "A spiral 3D printed dice tower for board-game and TTRPG night — internal zig-zag ramps tumble dice for a genuinely fair roll into the catch tray. A great gift for tabletop and D&D gamers; custom colors welcome.",
     price: "$26",
     image: "/prints/dice-tower.webp",
     model: "/models/shop/dice-tower.glb",
@@ -426,7 +426,7 @@ export const PRINTS: Print[] = [
     name: "Custom Desk Nameplate",
     tagline: "Your name (or handle) in 3D.",
     description:
-      "A two-tone desk nameplate printed with your name, title, or gamertag — pick your colors and font. A sharp little gift or personal touch.",
+      "A two-tone, 3D printed custom desk nameplate with your name, title, or gamertag — pick your colors and font. A sharp personalized gift or office desk accessory. Handmade to order.",
     price: "$18",
     image: "/prints/custom-nameplate.webp",
     material: "Silk PLA",
@@ -436,3 +436,53 @@ export const PRINTS: Print[] = [
     badge: "Personalized",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// SEO / structured data
+// ---------------------------------------------------------------------------
+
+/** Site origin — used to build absolute URLs for structured data. */
+export const SITE_ORIGIN = "https://kernsdev.com";
+
+/** Canonical URL of the 3D-print storefront. */
+export const SHOP_URL = `${SITE_ORIGIN}/3dprintshop`;
+
+/**
+ * schema.org structured data for the storefront: an `ItemList` of `Product`
+ * entries (name, description, image, brand, offers) generated from `PRINTS`.
+ * Injected as JSON-LD on the shop view for Google Rich Results / product
+ * discoverability. Kept separate from the site's Person / ProfessionalService
+ * schema in index.html so the two never conflict. Returns a plain object ready
+ * for `JSON.stringify`.
+ */
+export function shopProductsJsonLd(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "KernsDev 3D-Printed Decor, Figurines & Gifts",
+    itemListElement: PRINTS.map((p, i) => {
+      const inStock = Boolean(p.stripeLink) && !p.soldOut;
+      const product: Record<string, unknown> = {
+        "@type": "Product",
+        name: p.name,
+        description: p.description,
+        material: p.material,
+        brand: { "@type": "Brand", name: "KernsDev" },
+        offers: {
+          "@type": "Offer",
+          price: priceValue(p).toFixed(2),
+          priceCurrency: "USD",
+          availability: inStock
+            ? "https://schema.org/InStock"
+            : "https://schema.org/PreOrder",
+          url: inStock ? p.stripeLink : SHOP_URL,
+          seller: { "@type": "Organization", name: "KernsDev" },
+        },
+      };
+      if (p.image) product.image = `${SITE_ORIGIN}${p.image}`;
+      const category = (p.tags ?? [])[0];
+      if (category) product.category = category;
+      return { "@type": "ListItem", position: i + 1, item: product };
+    }),
+  };
+}
