@@ -74,10 +74,71 @@ function decodeURIComponentSafe(value: string): string {
  * inline styles — no HTML parsing, no payload reflection. Removes itself.
  */
 function showCookieToast(): void {
+  showToast("👀 no SQL here — have a 🍪");
+}
+
+/* --------------------------------------------------------------------------
+ * 3. konamiCode() — the classic ↑↑↓↓←→←→BA unlock. Purely cosmetic: a styled
+ *    console note, a toast, and a brief hue flourish on the page. No deps.
+ * ------------------------------------------------------------------------ */
+const KONAMI: readonly string[] = [
+  "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+  "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a",
+];
+
+export function konamiCode(): void {
+  if (typeof window === "undefined") return;
+  let i = 0;
+  window.addEventListener("keydown", (e) => {
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (key === KONAMI[i]) {
+      if (++i === KONAMI.length) { i = 0; konamiUnlock(); }
+    } else {
+      i = key === KONAMI[0] ? 1 : 0;
+    }
+  });
+}
+
+function konamiUnlock(): void {
+  try {
+    console.log(
+      "%c🎮 KONAMI UNLOCKED %c— up up down down… nice. thanks for poking around ✨",
+      "color:#35E7E0;font-weight:800;font-size:15px;",
+      "color:#9aa2b1;font-size:12px;",
+    );
+    showToast("🎮 ↑↑↓↓←→←→BA — you found it! ✨");
+    hueFlourish();
+  } catch {
+    /* ignore */
+  }
+}
+
+/** A short, self-removing hue-rotate pulse over the whole page. */
+function hueFlourish(): void {
+  if (typeof document === "undefined" || !document.documentElement) return;
+  const el = document.documentElement;
+  const prev = el.style.transition;
+  const id = "vk-konami-kf";
+  if (!document.getElementById(id)) {
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent =
+      "@keyframes vkKonami{0%{filter:hue-rotate(0)}50%{filter:hue-rotate(180deg)}100%{filter:hue-rotate(360deg)}}";
+    document.head.appendChild(style);
+  }
+  el.style.animation = "vkKonami 2.2s ease-in-out 1";
+  window.setTimeout(() => { el.style.animation = ""; el.style.transition = prev; }, 2400);
+}
+
+/**
+ * Minimal auto-dismiss toast. Uses textContent only (a fixed, safe string) and
+ * inline styles — no HTML parsing, no payload reflection. Removes itself.
+ */
+function showToast(text: string): void {
   if (typeof document === "undefined" || !document.body) return;
 
   const toast = document.createElement("div");
-  toast.textContent = "👀 no SQL here — have a 🍪";
+  toast.textContent = text;
   toast.setAttribute("role", "status");
   toast.style.cssText = [
     "position:fixed",
