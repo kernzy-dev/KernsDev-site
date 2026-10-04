@@ -401,24 +401,7 @@ export const PRINTS: Print[] = [
     size: "110 × 90 × 80 mm",
     leadTime: "Made to order · ships in 3–5 days",
     stripeLink: "https://buy.stripe.com/4gMfZg70p3u68EMf7f00003",
-  },
-  {
-    id: "headphone-stand",
-    tags: ["Desk & Office"],
-    name: "Headphone Stand",
-    tagline: "Clears the desk, shows off the cans.",
-    description:
-      "A clean, weighted 3D printed headphone stand that keeps your headset off the desk and cable-tidy. A crisp desk accent and gift for any gaming battlestation setup.",
-    price: "$24",
-    image: "/prints/headphone-stand.webp",
-    model: "/models/shop/headphone-stand.glb",
-    modelColor: "33333a",
-    material: "PLA Matte",
-    size: "130 × 110 × 280 mm",
-    leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "https://buy.stripe.com/aFa3cu98xd4G9IQ4sB00004",
-  },
-  {
+  },{
     id: "geometric-planter",
     tags: ["Home & Decor"],
     name: "Square Planter",
@@ -449,23 +432,7 @@ export const PRINTS: Print[] = [
     size: "80 × 80 × 150 mm",
     leadTime: "Made to order · ships in 3–5 days",
     stripeLink: "https://buy.stripe.com/cNi9AS5Wl6GiaMUf7f00006",
-  },
-  {
-    id: "custom-nameplate",
-    tags: ["Desk & Office", "Personalized"],
-    name: "Custom Desk Nameplate",
-    tagline: "Your name (or handle) in 3D.",
-    description:
-      "A two-tone, 3D printed custom desk nameplate with your name, title, or gamertag — pick your colors and font. A sharp personalized gift or office desk accessory. Handmade to order.",
-    price: "$18",
-    image: "/prints/custom-nameplate.webp",
-    material: "Silk PLA",
-    size: "180 × 45 × 40 mm",
-    leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "https://buy.stripe.com/eVq28qdoNc0Cg7e0cl00007",
-    badge: "Personalized",
-  },
-];
+  },];
 
 // ---------------------------------------------------------------------------
 // SEO / structured data
