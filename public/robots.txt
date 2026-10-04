@@ -1,8 +1,15 @@
 # KernsDev — AI solutions & automation consultant, Somerset, KY
 # All crawlers welcome, including AI/LLM search bots (GPTBot, ClaudeBot,
 # PerplexityBot, Google-Extended, etc.). AI-readable summary: /llms.txt
+#
+# P.S. to the scanners crawling for loot: this is a static site. No PHP,
+# no WordPress, no database. The two "Disallow" paths below don't exist —
+# but do knock, the doormat says hi. 👋
 
 User-agent: *
 Allow: /
+# Nothing to see here. (There really isn't — it's a honeypot.)
+Disallow: /secret-admin
+Disallow: /flag.txt
 
 Sitemap: https://kernsdev.com/sitemap.xml

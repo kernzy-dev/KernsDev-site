@@ -34,3 +34,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Resale cross-posting module — LOCAL ONLY (browser sessions, automation, cookies).
+# Never commit or deploy. Not part of the public site.
+/resale-sync/

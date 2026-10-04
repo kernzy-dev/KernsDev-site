@@ -1,0 +1,45 @@
+# Cloudflare Pages response headers for kernsdev.com
+# ---------------------------------------------------------------------------
+# Security hardening + caching. One `/*` block covers every route (SPA), then
+# two asset-specific blocks tune caching for hashed bundles vs. the HTML shell.
+# Cloudflare _headers format: one "Header: value" per line, `#` = comment.
+# The CSP MUST stay on a single physical line (no wrapping).
+
+/*
+  # Don't let browsers MIME-sniff a response into a different type.
+  X-Content-Type-Options: nosniff
+  # Legacy clickjacking guard (CSP frame-ancestors is the modern one; keep both).
+  X-Frame-Options: DENY
+  # Send origin (not full path) on cross-origin nav; nothing on HTTPS->HTTP.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Deny powerful features the site never uses.
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  # Force HTTPS for a year, subdomains included, and request HSTS preload.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  # For the curious. 404 for the ghosts.
+  X-Easter-Egg: nothing here but us ghosts 👻
+  # --- Content-Security-Policy -------------------------------------------
+  # default-src 'self'        : fallback — only same-origin unless widened below.
+  # base-uri 'self'           : block <base> hijacking of relative URLs.
+  # object-src 'none'         : no <object>/<embed>/<applet> (Flash-era vectors).
+  # img-src ... polyhaven     : own images + data:/blob: (canvas/textures) + PBR texture CDN.
+  # style-src 'unsafe-inline' : Tailwind + framer-motion/gsap inject inline styles; + Google Fonts CSS.
+  # font-src ... gstatic      : self + data: fonts + Google Fonts files.
+  # script-src                : own bundles; 'wasm-unsafe-eval' for three.js/draco/ktx2 wasm;
+  #                             'unsafe-inline' is REQUIRED — index.html ships two inline
+  #                             <script> blocks (asset-preload injector + /world pre-boot stub).
+  # connect-src               : self + texture CDN (HDR fetch) + web3forms (contact/print forms)
+  #                             + GitHub & Polymarket APIs (live StatusBlock data).
+  # worker-src 'self' blob:   : three.js / drei spin up blob: workers (transcoders).
+  # frame-src buy.stripe.com  : Stripe Payment Link checkout (shop).
+  # frame-ancestors 'none'    : nobody may iframe this site (clickjacking).
+  # form-action               : forms post via fetch; allow self + web3forms as a fallback.
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: blob: https://dl.polyhaven.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline'; connect-src 'self' https://dl.polyhaven.org https://api.web3forms.com https://api.github.com https://gamma-api.polymarket.com; worker-src 'self' blob:; frame-src https://buy.stripe.com; frame-ancestors 'none'; form-action 'self' https://api.web3forms.com
+
+# Hashed, content-addressed build assets — safe to cache forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The HTML shell must always be revalidated so new deploys are picked up.
+/index.html
+  Cache-Control: no-cache
