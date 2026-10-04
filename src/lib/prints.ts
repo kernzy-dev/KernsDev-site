@@ -193,7 +193,7 @@ export const PRINTS: Print[] = [
     tagline: "Smiley bandaged mummy hugging a jack-o'-lantern.",
     description:
       "A cuddly little 3D printed mummy all wrapped up and hugging a carved jack-o'-lantern — spooky-cute Halloween desk decor for a shelf, tiered tray, or party table, and a fun seasonal gift or trick-or-treat favor. Made to order in PLA; pick your colors.",
-    price: "$9",
+    price: "$10",
     image: "/prints/halloween-mummy-pumpkin.webp",
     material: "PLA",
     size: "~70 × 60 × 55 mm",
@@ -208,7 +208,7 @@ export const PRINTS: Print[] = [
     tagline: "Happy little ghost popping out of a carved pumpkin.",
     description:
       "A cheerful little 3D printed ghost peeking out of a carved jack-o'-lantern — a spooky-cute piece of Halloween desk decor for a shelf, tiered tray, or party table, and a fun trick-or-treat gift. Made to order in PLA; pick your colors.",
-    price: "$9",
+    price: "$10",
     image: "/prints/halloween-ghost-pumpkin.webp",
     material: "PLA",
     size: "~55 × 50 × 55 mm",
@@ -283,7 +283,7 @@ export const PRINTS: Print[] = [
     tagline: "Top hat, scarf & carrot nose.",
     description:
       "A plump, happy little 3D printed snowman all bundled up in a scarf and top hat, with a carrot nose and coal-button smile. Cozy Christmas and winter decor for a desk, shelf, or mantel — and a sweet stocking stuffer. Handmade to order in PLA; pick your color.",
-    price: "$12",
+    price: "$13",
     image: "/prints/christmas-snowman.webp",
     material: "PLA",
     size: "~90 mm tall",
@@ -328,7 +328,7 @@ export const PRINTS: Print[] = [
     tagline: "Iced gingerbread cookie ornament.",
     description:
       "A classic smiling 3D printed gingerbread man with piped-icing trim — great as a hanging Christmas ornament, gift topper, or little shelf friend. Prints flat and quick; add a loop of twine to hang. Handmade to order in PLA; pick your colors.",
-    price: "$9",
+    price: "$10",
     image: "/prints/christmas-gingerbread.webp",
     material: "PLA",
     size: "~80 × 65 mm",
