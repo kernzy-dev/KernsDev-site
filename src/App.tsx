@@ -24,6 +24,9 @@ const Shop = lazy(() => import("./components/Shop"));
 const ServicesPage = lazy(() => import("./components/ServicesPage"));
 // /3dtap — NFC-tap landing page for the 3D prints (phones tapping physical tags).
 const ThreeDTap = lazy(() => import("./components/ThreeDTap"));
+// /feedback — deep-linkable feedback form (NFC-tag target). Submits via Web3Forms,
+// then returns the visitor to the home page. Own chunk / route.
+const Feedback = lazy(() => import("./components/Feedback"));
 // /fleetcast — product landing for the Android-TV fleet manager (in development).
 const FleetCast = lazy(() => import("./components/FleetCast"));
 
@@ -69,6 +72,14 @@ export default function App() {
     return (
       <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
         <ThreeDTap />
+      </Suspense>
+    );
+  }
+
+  if (route === "/feedback") {
+    return (
+      <Suspense fallback={<div className="fixed inset-0 bg-neutral-950" />}>
+        <Feedback />
       </Suspense>
     );
   }
