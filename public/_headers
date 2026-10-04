@@ -34,7 +34,7 @@
   # frame-src buy.stripe.com  : Stripe Payment Link checkout (shop).
   # frame-ancestors 'none'    : nobody may iframe this site (clickjacking).
   # form-action               : forms post via fetch; allow self + web3forms as a fallback.
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: blob: https://dl.polyhaven.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline'; connect-src 'self' https://dl.polyhaven.org https://api.web3forms.com https://api.github.com https://gamma-api.polymarket.com; worker-src 'self' blob:; frame-src https://buy.stripe.com; frame-ancestors 'none'; form-action 'self' https://api.web3forms.com
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: blob: https://dl.polyhaven.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline'; connect-src 'self' blob: https://dl.polyhaven.org https://api.web3forms.com https://api.github.com https://gamma-api.polymarket.com; worker-src 'self' blob:; frame-src https://buy.stripe.com; frame-ancestors 'none'; form-action 'self' https://api.web3forms.com
 
 # Hashed, content-addressed build assets — safe to cache forever.
 /assets/*

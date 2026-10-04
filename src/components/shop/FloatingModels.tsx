@@ -20,7 +20,6 @@ const URLS = [
   "/models/shop/halloween-cute-ghost.glb",
   "/models/shop/halloween-pumpkin-cat.glb",
   "/models/shop/halloween-witch-dog.glb",
-  "/models/shop/christmas-nutcracker.glb",
   "/models/shop/dice-tower.glb",
   "/models/shop/neutral-pumpkin.glb",
   "/models/shop/geometric-planter.glb",

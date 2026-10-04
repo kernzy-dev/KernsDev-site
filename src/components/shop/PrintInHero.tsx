@@ -5,6 +5,7 @@ import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { gsap } from "gsap";
 import * as THREE from "three";
 import FloatingModels from "./FloatingModels";
+import ThreeErrorBoundary from "../three/ThreeErrorBoundary";
 
 /**
  * "It prints itself in" — the shop's signature 3D hero.
@@ -217,10 +218,14 @@ export default function PrintInHero({
       <directionalLight position={[-6, 4, -3]} intensity={0.5} color="#a0c8ff" />
       <pointLight position={[4, 1.6, 4]} intensity={1.4} distance={16} color={ACCENT} decay={1.6} />
 
-      {/* Ambient field of the store's real models, tumbling behind the dragon. */}
-      <Suspense fallback={null}>
-        <FloatingModels animate={animate} mobile={mobile} />
-      </Suspense>
+      {/* Ambient field of the store's real models, tumbling behind the dragon.
+          Isolated in its own error boundary so a bad/missing model can never
+          take the dragon (or the whole hero) down with it. */}
+      <ThreeErrorBoundary fallback={null}>
+        <Suspense fallback={null}>
+          <FloatingModels animate={animate} mobile={mobile} />
+        </Suspense>
+      </ThreeErrorBoundary>
 
       <Suspense fallback={null}>
         <Dragon animate={animate} />
