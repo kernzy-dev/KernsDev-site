@@ -80,18 +80,20 @@ function makeInst(): Inst {
   let x = 0,
     y = 0,
     z = 0;
+  // Keep inside the camera frustum at these depths and out of the central hero
+  // zone, so they frame the dragon on-screen instead of landing off-frame/too deep.
   for (let t = 0; t < 8; t++) {
-    x = rand(-8, 8);
-    y = rand(-1.5, 7);
-    z = rand(-13, -2);
-    if (!(Math.hypot(x, z) < 2.4 && z > -4.5)) break; // keep clear of the hero
+    x = rand(-5.5, 5.5);
+    y = rand(-1, 5);
+    z = rand(-9, -2.5);
+    if (!(Math.abs(x) < 1.9 && z > -5)) break; // keep clear of the hero dragon
   }
   return {
     base: new THREE.Vector3(x, y, z),
-    scale: rand(0.3, 0.85),
+    scale: rand(0.5, 1.3),
     rot: new THREE.Euler(rand(0, 6.28), rand(0, 6.28), rand(0, 6.28)),
     spin: new THREE.Vector3(rand(-0.4, 0.4), rand(-0.5, 0.5), rand(-0.4, 0.4)),
-    amp: rand(0.1, 0.4),
+    amp: rand(0.12, 0.4),
     freq: rand(0.2, 0.6),
     phase: rand(0, 6.28),
   };
@@ -105,15 +107,25 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color("#8a8296"),
-        roughness: 0.82,
+        // Light body + soft self-emissive so they clearly read against the dark
+        // shop ground no matter how scene lights reach the back, but stay under
+        // the Bloom threshold (1.0) so they don't glow/compete with the dragon.
+        color: new THREE.Color("#d4cde0"),
+        emissive: new THREE.Color("#514a60"),
+        emissiveIntensity: 0.45,
+        roughness: 0.7,
         metalness: 0.05,
       }),
     [],
   );
 
   const geos = useMemo(
-    () => gltfs.map((g) => mergedGeo(g.scene)),
+    () =>
+      gltfs.map((g, i) => {
+        const geo = g?.scene ? mergedGeo(g.scene) : null;
+        if (!geo) console.warn("[FloatingModels] merge produced nothing, skipping", URLS[i]);
+        return geo;
+      }),
     [gltfs],
   );
 
@@ -150,6 +162,10 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
   useEffect(() => {
     const now = performance.now() / 1000;
     for (let i = 0; i < insts.length; i++) write(i, now);
+    const n = insts.reduce((a, b) => a + b.length, 0);
+    console.info(
+      `[FloatingModels] ${n} instances across ${geos.filter(Boolean).length}/${URLS.length} models`,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insts]);
 

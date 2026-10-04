@@ -194,8 +194,9 @@ export default function PrintInHero({ animate = true }: { animate?: boolean }) {
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.7, 6.2] }}
     >
-      {/* Depth fog so the floating product field recedes behind the hero dragon. */}
-      <fog attach="fog" args={["#0b0b14", 7, 24]} />
+      {/* Gentle depth cue only — starts past the floating field (dist ~8.7–15)
+          so it adds recession without swallowing the models into the dark. */}
+      <fog attach="fog" args={["#0b0b14", 8, 40]} />
       <hemisphereLight args={["#ffe3cc", "#0a0a12", 0.55]} />
       <ambientLight intensity={0.35} color="#fff0e2" />
       <directionalLight
