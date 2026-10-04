@@ -94,13 +94,18 @@ export default function Shop() {
   const live = PRINTS.filter((p) => p.stripeLink && !p.soldOut).length;
   const [viewing, setViewing] = useState<Print | null>(null);
 
-  // Signature 3D hero: mount only with WebGL on a wide-enough viewport (phones
-  // get the static header). Reduced-motion still shows the finished model, just
-  // without the print-in sweep or turntable.
+  // Signature 3D hero: mounts wherever WebGL is available — phones included
+  // (most of the shop's traffic), tiered down for performance on small screens.
+  // No-WebGL devices get the static header; reduced-motion shows the finished
+  // model without the print-in sweep or turntable.
   const reduced = useReducedMotion();
   const [heroOn, setHeroOn] = useState(false);
+  const [mobile, setMobile] = useState(false);
   useEffect(() => {
-    if (hasWebGL() && window.innerWidth >= 640) setHeroOn(true);
+    if (hasWebGL()) {
+      setMobile(window.innerWidth < 640);
+      setHeroOn(true);
+    }
   }, []);
 
   // Filter / search state — a normal storefront browse experience.
@@ -165,7 +170,7 @@ export default function Shop() {
             >
               <ThreeErrorBoundary fallback={null}>
                 <Suspense fallback={null}>
-                  <PrintInHero animate={!reduced} />
+                  <PrintInHero animate={!reduced} mobile={mobile} />
                 </Suspense>
               </ThreeErrorBoundary>
               {/* Legibility scrim so the copy reads over the scene. */}

@@ -186,12 +186,19 @@ function ParallaxRig() {
   return null;
 }
 
-export default function PrintInHero({ animate = true }: { animate?: boolean }) {
+export default function PrintInHero({
+  animate = true,
+  mobile = false,
+}: {
+  animate?: boolean;
+  mobile?: boolean;
+}) {
   return (
     <Canvas
-      shadows
-      dpr={[1, 1.5]}
-      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+      // Mobile tier-down: no shadow maps, lower dpr, lighter AA.
+      shadows={!mobile}
+      dpr={mobile ? [1, 1.25] : [1, 1.5]}
+      gl={{ alpha: true, antialias: !mobile, powerPreference: "high-performance" }}
       camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.7, 6.2] }}
     >
       {/* Gentle depth cue only — starts past the floating field (dist ~8.7–15)
@@ -212,7 +219,7 @@ export default function PrintInHero({ animate = true }: { animate?: boolean }) {
 
       {/* Ambient field of the store's real models, tumbling behind the dragon. */}
       <Suspense fallback={null}>
-        <FloatingModels animate={animate} />
+        <FloatingModels animate={animate} mobile={mobile} />
       </Suspense>
 
       <Suspense fallback={null}>
@@ -225,16 +232,20 @@ export default function PrintInHero({ animate = true }: { animate?: boolean }) {
         scale={14}
         blur={2.6}
         far={4}
-        resolution={1024}
+        resolution={mobile ? 384 : 1024}
         color="#000000"
       />
 
       <ParallaxRig />
 
-      <EffectComposer>
-        <Bloom luminanceThreshold={1.0} intensity={0.9} mipmapBlur radius={0.7} />
-        <Vignette eskil={false} offset={0.25} darkness={0.55} />
-      </EffectComposer>
+      {/* Post-processing is desktop-only — the emissive print-line still reads
+          bright without Bloom, so phones skip the extra fullscreen passes. */}
+      {!mobile && (
+        <EffectComposer>
+          <Bloom luminanceThreshold={1.0} intensity={0.9} mipmapBlur radius={0.7} />
+          <Vignette eskil={false} offset={0.25} darkness={0.55} />
+        </EffectComposer>
+      )}
     </Canvas>
   );
 }

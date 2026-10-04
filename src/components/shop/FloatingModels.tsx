@@ -99,8 +99,16 @@ function makeInst(): Inst {
   };
 }
 
-export default function FloatingModels({ animate = true }: { animate?: boolean }) {
-  const gltfs = useGLTF(URLS) as unknown as { scene: THREE.Object3D }[];
+export default function FloatingModels({
+  animate = true,
+  mobile = false,
+}: {
+  animate?: boolean;
+  mobile?: boolean;
+}) {
+  // Mobile: load fewer distinct models (4) to cut GLB fetches + draw calls.
+  const urls = useMemo(() => (mobile ? URLS.slice(0, 4) : URLS), [mobile]);
+  const gltfs = useGLTF(urls) as unknown as { scene: THREE.Object3D }[];
   const meshes = useRef<(THREE.InstancedMesh | null)[]>([]);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
@@ -123,23 +131,25 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
     () =>
       gltfs.map((g, i) => {
         const geo = g?.scene ? mergedGeo(g.scene) : null;
-        if (!geo) console.warn("[FloatingModels] merge produced nothing, skipping", URLS[i]);
+        if (!geo) console.warn("[FloatingModels] merge produced nothing, skipping", urls[i]);
         return geo;
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [gltfs],
   );
 
-  // Distribute ~16 (narrow) or ~26 (wide) copies across the models.
+  // Copies: ~10 on mobile, ~18 narrow desktop, ~26 wide.
   const insts = useMemo(() => {
-    const wide = typeof window !== "undefined" && window.innerWidth >= 1024;
-    const total = wide ? 26 : 16;
-    const buckets: Inst[][] = URLS.map(() => []);
+    const w = typeof window !== "undefined" ? window.innerWidth : 1280;
+    const total = mobile ? 10 : w >= 1024 ? 26 : 18;
+    const n = geos.length || 1;
+    const buckets: Inst[][] = geos.map(() => []);
     for (let i = 0; i < total; i++) {
-      if (geos[i % geos.length]) buckets[i % geos.length].push(makeInst());
+      if (geos[i % n]) buckets[i % n].push(makeInst());
     }
     return buckets;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geos]);
+  }, [geos, mobile]);
 
   const write = (i: number, now: number) => {
     const mesh = meshes.current[i];
@@ -164,7 +174,7 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
     for (let i = 0; i < insts.length; i++) write(i, now);
     const n = insts.reduce((a, b) => a + b.length, 0);
     console.info(
-      `[FloatingModels] ${n} instances across ${geos.filter(Boolean).length}/${URLS.length} models`,
+      `[FloatingModels] ${n} instances across ${geos.filter(Boolean).length}/${urls.length} models${mobile ? " (mobile)" : ""}`,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insts]);
@@ -196,7 +206,7 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
       {geos.map((geo, i) =>
         geo && insts[i]?.length ? (
           <instancedMesh
-            key={URLS[i]}
+            key={urls[i]}
             ref={(el) => {
               meshes.current[i] = el;
             }}
@@ -209,4 +219,6 @@ export default function FloatingModels({ animate = true }: { animate?: boolean }
   );
 }
 
-URLS.forEach((u) => useGLTF.preload(u));
+// Preload only the core 4 (used on every device); desktop loads the rest when
+// the hero mounts, so phones never fetch all 8 GLBs.
+URLS.slice(0, 4).forEach((u) => useGLTF.preload(u));
