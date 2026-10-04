@@ -4,6 +4,7 @@ import { ContactShadows, useGLTF } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { gsap } from "gsap";
 import * as THREE from "three";
+import FloatingModels from "./FloatingModels";
 
 /**
  * "It prints itself in" — the shop's signature 3D hero.
@@ -193,6 +194,8 @@ export default function PrintInHero({ animate = true }: { animate?: boolean }) {
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.7, 6.2] }}
     >
+      {/* Depth fog so the floating product field recedes behind the hero dragon. */}
+      <fog attach="fog" args={["#0b0b14", 7, 24]} />
       <hemisphereLight args={["#ffe3cc", "#0a0a12", 0.55]} />
       <ambientLight intensity={0.35} color="#fff0e2" />
       <directionalLight
@@ -205,6 +208,11 @@ export default function PrintInHero({ animate = true }: { animate?: boolean }) {
       />
       <directionalLight position={[-6, 4, -3]} intensity={0.5} color="#a0c8ff" />
       <pointLight position={[4, 1.6, 4]} intensity={1.4} distance={16} color={ACCENT} decay={1.6} />
+
+      {/* Ambient field of the store's real models, tumbling behind the dragon. */}
+      <Suspense fallback={null}>
+        <FloatingModels animate={animate} />
+      </Suspense>
 
       <Suspense fallback={null}>
         <Dragon animate={animate} />
