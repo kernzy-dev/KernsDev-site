@@ -1,7 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, useGLTF } from "@react-three/drei";
-import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { gsap } from "gsap";
 import * as THREE from "three";
 import FloatingModels from "./FloatingModels";
@@ -198,7 +197,7 @@ export default function PrintInHero({
     <Canvas
       // Mobile tier-down: no shadow maps, lower dpr, lighter AA.
       shadows={!mobile}
-      dpr={mobile ? [1, 1.25] : [1, 1.5]}
+      dpr={[1, 1.25]}
       gl={{ alpha: true, antialias: !mobile, powerPreference: "high-performance" }}
       camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.7, 6.2] }}
     >
@@ -243,14 +242,9 @@ export default function PrintInHero({
 
       <ParallaxRig />
 
-      {/* Post-processing is desktop-only — the emissive print-line still reads
-          bright without Bloom, so phones skip the extra fullscreen passes. */}
-      {!mobile && (
-        <EffectComposer>
-          <Bloom luminanceThreshold={1.0} intensity={0.9} mipmapBlur radius={0.7} />
-          <Vignette eskil={false} offset={0.25} darkness={0.55} />
-        </EffectComposer>
-      )}
+      {/* Post-processing removed entirely — Bloom/Vignette were the biggest GPU
+          cost and caused lag on weaker machines; the emissive print-line still
+          reads bright on its own. */}
     </Canvas>
   );
 }

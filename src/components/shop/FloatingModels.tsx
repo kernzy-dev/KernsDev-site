@@ -5,24 +5,25 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
 /**
- * FloatingModels — an ambient field of the store's real product models drifting
- * in the air and tumbling on all three axes behind the printed dragon, like a
- * particle field made of actual products.
+ * FloatingModels — an ambient field of the store's product models drifting and
+ * tumbling behind the printed dragon. Each model is merged into one geometry and
+ * drawn as a single InstancedMesh (so the field is ~N_models draw calls, not
+ * N_copies), tinted its own warm color.
  *
- * Performance: each distinct model's meshes are merged into ONE geometry and
- * drawn as a single InstancedMesh, so the whole field is ~N_models draw calls
- * (not N_copies). All instances share one muted material so they recede behind
- * the warm hero dragon and never bloom. Reduced-motion → placed once, frozen.
+ * Perf: kept to LIGHT models only (the 1–2 MB cute-ghost / witch-dog meshes are
+ * deliberately NOT in the field) and low instance counts, so it stays smooth on
+ * any GPU. Reduced-motion → placed once, frozen.
  */
 
-const URLS = [
-  "/models/shop/articulated-axolotl.glb",
-  "/models/shop/halloween-cute-ghost.glb",
-  "/models/shop/halloween-pumpkin-cat.glb",
-  "/models/shop/halloween-witch-dog.glb",
-  "/models/shop/dice-tower.glb",
-  "/models/shop/neutral-pumpkin.glb",
-  "/models/shop/geometric-planter.glb",
+// Light models, ordered lightest-first so the mobile slice loads the smallest
+// GLBs. Each carries a representative warm tint so the field reads colorful, not
+// grey — one material per model keeps it ~one draw call each.
+const MODELS = [
+  { url: "/models/shop/geometric-planter.glb", color: "#9fb389" }, // sage
+  { url: "/models/shop/dice-tower.glb", color: "#8c7fa0" }, // dusty violet
+  { url: "/models/shop/articulated-axolotl.glb", color: "#e79aa6" }, // coral
+  { url: "/models/shop/neutral-pumpkin.glb", color: "#e27a2c" }, // pumpkin
+  { url: "/models/shop/halloween-pumpkin-cat.glb", color: "#f0a24a" }, // amber
 ];
 
 type Inst = {
@@ -65,11 +66,8 @@ function mergedGeo(scene: THREE.Object3D): THREE.BufferGeometry | null {
   box.getSize(size);
   box.getCenter(center);
   merged.translate(-center.x, -center.y, -center.z);
-  merged.scale(
-    1 / (Math.max(size.x, size.y, size.z) || 1),
-    1 / (Math.max(size.x, size.y, size.z) || 1),
-    1 / (Math.max(size.x, size.y, size.z) || 1),
-  );
+  const s = 1 / (Math.max(size.x, size.y, size.z) || 1);
+  merged.scale(s, s, s);
   return merged;
 }
 
@@ -79,8 +77,6 @@ function makeInst(): Inst {
   let x = 0,
     y = 0,
     z = 0;
-  // Keep inside the camera frustum at these depths and out of the central hero
-  // zone, so they frame the dragon on-screen instead of landing off-frame/too deep.
   for (let t = 0; t < 8; t++) {
     x = rand(-5.5, 5.5);
     y = rand(-1, 5);
@@ -105,25 +101,28 @@ export default function FloatingModels({
   animate?: boolean;
   mobile?: boolean;
 }) {
-  // Mobile: load fewer distinct models (4) to cut GLB fetches + draw calls.
-  const urls = useMemo(() => (mobile ? URLS.slice(0, 4) : URLS), [mobile]);
+  // Mobile: fewer distinct models (3 lightest) to cut GLB fetches + draw calls.
+  const models = useMemo(() => (mobile ? MODELS.slice(0, 3) : MODELS), [mobile]);
+  const urls = useMemo(() => models.map((m) => m.url), [models]);
   const gltfs = useGLTF(urls) as unknown as { scene: THREE.Object3D }[];
   const meshes = useRef<(THREE.InstancedMesh | null)[]>([]);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  const material = useMemo(
+  // One tinted material per model — a touch of self-emissive in its own hue so
+  // each reads in color against the dark shop ground.
+  const materials = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        // Light body + soft self-emissive so they clearly read against the dark
-        // shop ground no matter how scene lights reach the back, but stay under
-        // the Bloom threshold (1.0) so they don't glow/compete with the dragon.
-        color: new THREE.Color("#d4cde0"),
-        emissive: new THREE.Color("#514a60"),
-        emissiveIntensity: 0.45,
-        roughness: 0.7,
-        metalness: 0.05,
+      models.map((m) => {
+        const c = new THREE.Color(m.color);
+        return new THREE.MeshStandardMaterial({
+          color: c,
+          emissive: c.clone().multiplyScalar(0.3),
+          emissiveIntensity: 1,
+          roughness: 0.6,
+          metalness: 0.05,
+        });
       }),
-    [],
+    [models],
   );
 
   const geos = useMemo(
@@ -137,10 +136,10 @@ export default function FloatingModels({
     [gltfs],
   );
 
-  // Copies: ~10 on mobile, ~18 narrow desktop, ~26 wide.
+  // Low counts for a smooth field: ~7 mobile, ~11 narrow, ~14 wide.
   const insts = useMemo(() => {
     const w = typeof window !== "undefined" ? window.innerWidth : 1280;
-    const total = mobile ? 10 : w >= 1024 ? 26 : 18;
+    const total = mobile ? 7 : w >= 1024 ? 14 : 11;
     const n = geos.length || 1;
     const buckets: Inst[][] = geos.map(() => []);
     for (let i = 0; i < total; i++) {
@@ -167,7 +166,6 @@ export default function FloatingModels({
     mesh.instanceMatrix.needsUpdate = true;
   };
 
-  // Place once on mount (and whenever frozen) so the first frame isn't at origin.
   useEffect(() => {
     const now = performance.now() / 1000;
     for (let i = 0; i < insts.length; i++) write(i, now);
@@ -192,13 +190,13 @@ export default function FloatingModels({
     }
   });
 
-  // Dispose merged geometries + the shared material on unmount.
+  // Dispose merged geometries + the per-model materials on unmount.
   useEffect(() => {
     return () => {
       geos.forEach((g) => g?.dispose());
-      material.dispose();
+      materials.forEach((m) => m.dispose());
     };
-  }, [geos, material]);
+  }, [geos, materials]);
 
   return (
     <group>
@@ -209,7 +207,7 @@ export default function FloatingModels({
             ref={(el) => {
               meshes.current[i] = el;
             }}
-            args={[geo, material, insts[i].length]}
+            args={[geo, materials[i], insts[i].length]}
             frustumCulled={false}
           />
         ) : null,
@@ -218,6 +216,6 @@ export default function FloatingModels({
   );
 }
 
-// Preload only the core 4 (used on every device); desktop loads the rest when
-// the hero mounts, so phones never fetch all 8 GLBs.
-URLS.slice(0, 4).forEach((u) => useGLTF.preload(u));
+// Preload the 3 mobile models (used on every device); desktop fetches the other
+// two when the hero mounts.
+MODELS.slice(0, 3).forEach((m) => useGLTF.preload(m.url));
