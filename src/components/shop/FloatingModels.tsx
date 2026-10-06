@@ -16,14 +16,16 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
  */
 
 // Light models, ordered lightest-first so the mobile slice loads the smallest
-// GLBs. Each carries a representative warm tint so the field reads colorful, not
-// grey — one material per model keeps it ~one draw call each.
+// GLBs. Each carries a VIVID tint and is self-emissive (see materials below) so
+// the field reads as glowing colored particles against the dark shop ground,
+// not grey silhouettes swallowed by fog — one material per model keeps it ~one
+// draw call each.
 const MODELS = [
-  { url: "/models/shop/geometric-planter.glb", color: "#9fb389" }, // sage
-  { url: "/models/shop/dice-tower.glb", color: "#8c7fa0" }, // dusty violet
-  { url: "/models/shop/articulated-axolotl.glb", color: "#e79aa6" }, // coral
-  { url: "/models/shop/neutral-pumpkin.glb", color: "#e27a2c" }, // pumpkin
-  { url: "/models/shop/halloween-pumpkin-cat.glb", color: "#f0a24a" }, // amber
+  { url: "/models/shop/geometric-planter.glb", color: "#2dd4bf" }, // teal
+  { url: "/models/shop/dice-tower.glb", color: "#a855f7" }, // violet
+  { url: "/models/shop/articulated-axolotl.glb", color: "#ec4899" }, // pink
+  { url: "/models/shop/neutral-pumpkin.glb", color: "#f97316" }, // orange
+  { url: "/models/shop/halloween-pumpkin-cat.glb", color: "#fbbf24" }, // gold
 ];
 
 type Inst = {
@@ -71,25 +73,28 @@ function mergedGeo(scene: THREE.Object3D): THREE.BufferGeometry | null {
   return merged;
 }
 
-/** A random instance placed in a volume behind the dragon, skipping the central
- *  cylinder so the hero model + header text stay clear. */
+/** A random instance placed in a wide volume that fills the whole frame around
+ *  (and slightly in front of) the dragon — a drifting particle field — while
+ *  skipping the central column so the hero model + header copy stay clear. */
 function makeInst(): Inst {
   let x = 0,
     y = 0,
     z = 0;
-  for (let t = 0; t < 8; t++) {
-    x = rand(-5.5, 5.5);
-    y = rand(-1, 5);
-    z = rand(-9, -2.5);
-    if (!(Math.abs(x) < 1.9 && z > -5)) break; // keep clear of the hero dragon
+  for (let t = 0; t < 10; t++) {
+    x = rand(-7.5, 7.5);
+    y = rand(-4.5, 5.5);
+    z = rand(-8, -0.3); // spread in depth, but not so close they blow up into blobs
+    // keep clear of the hero dragon's column (centered on the camera axis)
+    const nearAxis = x * x + z * z < 2.3 * 2.3;
+    if (!(nearAxis && y > -0.5 && y < 3.8)) break;
   }
   return {
     base: new THREE.Vector3(x, y, z),
-    scale: rand(0.5, 1.3),
+    scale: rand(0.3, 0.82), // smaller = more particle-like
     rot: new THREE.Euler(rand(0, 6.28), rand(0, 6.28), rand(0, 6.28)),
     spin: new THREE.Vector3(rand(-0.4, 0.4), rand(-0.5, 0.5), rand(-0.4, 0.4)),
-    amp: rand(0.12, 0.4),
-    freq: rand(0.2, 0.6),
+    amp: rand(0.2, 0.6),
+    freq: rand(0.15, 0.5),
     phase: rand(0, 6.28),
   };
 }
@@ -108,18 +113,21 @@ export default function FloatingModels({
   const meshes = useRef<(THREE.InstancedMesh | null)[]>([]);
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  // One tinted material per model — a touch of self-emissive in its own hue so
-  // each reads in color against the dark shop ground.
+  // One vivid material per model — strongly self-emissive in its own hue so each
+  // model glows as a colored "particle" and keeps its color even out in the fog
+  // (lit shading alone read as grey/black against the dark ground). A little
+  // diffuse on top keeps some form/shading so they don't look flat.
   const materials = useMemo(
     () =>
       models.map((m) => {
         const c = new THREE.Color(m.color);
         return new THREE.MeshStandardMaterial({
           color: c,
-          emissive: c.clone().multiplyScalar(0.3),
-          emissiveIntensity: 1,
-          roughness: 0.6,
-          metalness: 0.05,
+          emissive: c,
+          emissiveIntensity: 0.9,
+          roughness: 0.45,
+          metalness: 0.0,
+          toneMapped: false, // let the vivid hues pop instead of being rolled off
         });
       }),
     [models],
@@ -136,10 +144,11 @@ export default function FloatingModels({
     [gltfs],
   );
 
-  // Low counts for a smooth field: ~7 mobile, ~11 narrow, ~14 wide.
+  // A fuller field now that each model is a small self-lit particle: ~12 mobile,
+  // ~20 narrow, ~28 wide. Still instanced (≈5 draw calls total) so it stays smooth.
   const insts = useMemo(() => {
     const w = typeof window !== "undefined" ? window.innerWidth : 1280;
-    const total = mobile ? 7 : w >= 1024 ? 14 : 11;
+    const total = mobile ? 12 : w >= 1024 ? 28 : 20;
     const n = geos.length || 1;
     const buckets: Inst[][] = geos.map(() => []);
     for (let i = 0; i < total; i++) {

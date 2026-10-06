@@ -384,7 +384,12 @@ function safeHref(u: string): string {
 function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) {
   const pack = p.pack;
   const sizes = sizeOptions(p);
-  const [size, setSize] = useState(sizes[0]);
+  // Only offer sizes that actually have a checkout link. Most products ship a
+  // single (base) size for now, so the S/M/L selector only appears once the
+  // M/L links exist — keeps the card clean with no "coming soon" sub-states.
+  const availSizes = sizes.filter((s) => !!safeHref(s.stripeLink));
+  const [size, setSize] = useState(availSizes[0] ?? sizes[0]);
+  const multiSize = availSizes.length > 1;
   const [qty, setQty] = useState(5);
   const packSum = pack ? packTotal(pack, qty) : 0;
   const savings = pack ? qty * pack.unit - packSum : 0;
@@ -502,10 +507,10 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
               {savings > 0 && <span className="text-accent"> — you save ${savings.toFixed(2)}</span>}
             </p>
           </div>
-        ) : (
-          /* Size selector — S / M / L, scales dimensions + price */
+        ) : multiSize ? (
+          /* Size selector — only sizes that have a live checkout link */
           <div className="mt-4 flex gap-1.5" role="group" aria-label="Choose a size">
-            {sizes.map((s) => (
+            {availSizes.map((s) => (
               <button
                 key={s.key}
                 type="button"
@@ -522,11 +527,11 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
               </button>
             ))}
           </div>
-        )}
+        ) : null}
 
         <dl className="text-xs text-neutral-500 mt-3 space-y-0.5">
           <div><span className="text-neutral-600">Material:</span> {p.material}</div>
-          <div><span className="text-neutral-600">{pack ? "Size:" : `${size.name} size:`}</span> {pack ? p.size : size.dims}</div>
+          <div><span className="text-neutral-600">{pack || !multiSize ? "Size:" : `${size.name} size:`}</span> {pack ? p.size : size.dims}</div>
           {p.leadTime && <div>{p.leadTime}</div>}
         </dl>
 
@@ -538,7 +543,7 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
               rel="noopener noreferrer"
               className="btn-primary text-sm w-full text-center"
             >
-              {pack ? `Buy ${qty} — ${priceLabel}` : `Buy ${size.name} — ${size.price}`}
+              {pack ? `Buy ${qty} — ${priceLabel}` : multiSize ? `Buy ${size.name} — ${size.price}` : `Buy — ${size.price}`}
             </a>
           ) : (
             <span className="inline-flex w-full justify-center text-sm border border-neutral-800 text-neutral-500 px-4 py-2 rounded-md cursor-not-allowed">

@@ -201,9 +201,10 @@ export default function PrintInHero({
       gl={{ alpha: true, antialias: !mobile, powerPreference: "high-performance" }}
       camera={{ fov: 35, near: 0.1, far: 100, position: [0, 1.7, 6.2] }}
     >
-      {/* Gentle depth cue only — starts past the floating field (dist ~8.7–15)
-          so it adds recession without swallowing the models into the dark. */}
-      <fog attach="fog" args={["#0b0b14", 8, 40]} />
+      {/* Gentle depth cue only — pushed back so the colored particle field
+          (dist ~5–14) keeps its hues instead of being desaturated into the dark;
+          only the very farthest models softly recede. */}
+      <fog attach="fog" args={["#0b0b14", 16, 52]} />
       <hemisphereLight args={["#ffe3cc", "#0a0a12", 0.55]} />
       <ambientLight intensity={0.35} color="#fff0e2" />
       <directionalLight

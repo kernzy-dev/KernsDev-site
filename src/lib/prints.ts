@@ -149,7 +149,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "116 × 116 × 103 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/00wbJ04ShfcO3ksaQZ0000b",
     badge: "New",
   },
   {
@@ -166,7 +166,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "150 × 60 × 90 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFaeVc98x7Km6wEcZ70000c",
     badge: "Halloween",
   },
   {
@@ -182,7 +182,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~17 × 17 × 24 mm each",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/28E6oG1G54ya4ow0cl0000d",
     badge: "Halloween",
     pack: { unit: 2, per: 5, off: 0.5 },
   },
@@ -198,7 +198,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~70 × 60 × 55 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/3cIbJ00C17KmaMUcZ70000e",
     badge: "Halloween",
   },
   {
@@ -213,22 +213,22 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~55 × 50 × 55 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/14A14mbgF2q22gocZ70000f",
     badge: "Halloween",
   },
   {
     id: "halloween-ghost-bundle",
     tags: ["Halloween", "Home & Decor"],
     name: "Cute Ghost Bundle",
-    tagline: "A cozy set of our bestselling smiley white ghosts.",
+    tagline: "All three of our cozy ghost designs as a set.",
     description:
-      "A whole cozy family of 3D printed ghosts — smooth glossy white bodies, happy smiling faces, and rosy little cheeks. Our bestselling spooky-cute design, now bundled as a set so you can line the gang up across a desk, shelf, tiered tray, or Halloween party table. A charming piece of autumn decor and a fun gift, party favor, or set of stocking stuffers. Handmade to order in PLA; pick your color.",
+      "A set of our three bestselling 3D printed ghost designs — a little ghost peeking out of a carved pumpkin bowl, a ghost popping out of a jack-o'-lantern, and a cozy ghost in a pom-pom beanie holding a pumpkin-spice latte. Spooky-cute Halloween desk decor for a shelf, tiered tray, or party table, and a fun gift, party favor, or set of stocking stuffers. Handmade to order in PLA; pick your colors.",
     price: "$16",
     image: "/prints/halloween-ghost-bundle.webp",
     material: "PLA",
     size: "~45 × 40 × 55 mm each (set)",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/28E9AS1G59Su9IQe3b0000g",
     badge: "Halloween",
   },
   {
@@ -243,7 +243,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~110 × 75 × 75 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/aFa9AS98x0hU3ksgbj0000h",
     badge: "Christmas",
   },
   {
@@ -258,7 +258,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~150 × 120 × 110 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/14A6oGesR0hUcV2aQZ0000i",
     badge: "Christmas",
   },
   {
@@ -273,7 +273,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "250 × 180 × 90 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/7sY3cu0C1ggS2go2kt0000j",
     badge: "Christmas",
   },
   {
@@ -288,7 +288,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~120–165 mm tall (set of 3)",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/8x2fZg1G59Su7AIgbj0000k",
     badge: "Christmas",
   },
   {
@@ -303,7 +303,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~150–210 mm tall (set of 3)",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/9B66oG84tggS8EM9MV0000l",
     badge: "Christmas",
   },
   {
@@ -318,7 +318,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~90 mm tall",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/9B628q70p4ya2gocZ70000m",
     badge: "Christmas",
   },
   {
@@ -333,7 +333,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~120 mm tall",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/cNi9AS3Odc0CaMU6AJ0000n",
     badge: "Christmas",
   },
   {
@@ -348,7 +348,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~85 mm tall",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQdR8esR4ya2gobV30000o",
     badge: "Christmas",
   },
   {
@@ -363,7 +363,7 @@ export const PRINTS: Print[] = [
     material: "PLA",
     size: "~80 × 65 mm",
     leadTime: "Made to order · ships in 3–5 days",
-    stripeLink: "",
+    stripeLink: "https://buy.stripe.com/5kQfZg4She8K1ckf7f0000p",
     badge: "Christmas",
   },
   {
