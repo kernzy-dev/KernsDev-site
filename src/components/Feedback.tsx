@@ -1,16 +1,14 @@
 import { useState } from "react";
+import { FORM_ENDPOINT, formSucceeded } from "../lib/forms";
 
 /**
  * Feedback — a standalone, deep-linkable page (route: /feedback) meant to be the
  * target of an NFC tag on a shipped print: a customer taps the tag, lands here,
  * leaves a quick rating + comment, and on submit is bounced back to the home page.
  *
- * No backend: posts to Web3Forms (same VITE_WEB3FORMS_KEY the contact/custom-print
- * forms use), so feedback emails Grant directly and his address never ships to the
- * client. Reuses the house dark aesthetic; no new dependencies.
+ * No backend: posts to FormSubmit so feedback emails Grant directly.
  */
 
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
 const RETURN_TO = "/";          // where a completed form sends the visitor
 const RETURN_DELAY = 1800;      // ms to show the thank-you before redirecting
 
@@ -29,17 +27,22 @@ export default function Feedback() {
     setError("");
     try {
       const data = new FormData(form);
-      data.append("access_key", WEB3FORMS_KEY || "");
-      data.append("subject", "New shop feedback — kernsdev.com");
+      data.append("_subject", "New shop feedback — kernsdev.com");
+      data.append("_template", "table");
+      data.append("_captcha", "false");
       data.append("rating", rating ? `${rating} / 5` : "not rated");
-      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data });
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" },
+      });
       const json = await res.json();
-      if (json.success) {
+      if (formSucceeded(json)) {
         setState("ok");
         // Completed → return to the home page.
         window.setTimeout(() => { window.location.href = RETURN_TO; }, RETURN_DELAY);
       } else {
-        setError(json.message || "Something went wrong — please try again.");
+        setError((json as { message?: string }).message || "Something went wrong — please try again.");
         setState("error");
       }
     } catch {
@@ -64,21 +67,17 @@ export default function Feedback() {
         </div>
 
         {state === "ok" ? (
-          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center">
+          <div role="status" aria-live="polite" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8 text-center">
             <p className="text-emerald-300 font-medium text-lg">Thanks for the feedback! 🎉</p>
             <p className="text-sm text-neutral-400 mt-2">Taking you back home…</p>
           </div>
-        ) : !WEB3FORMS_KEY ? (
-          <p className="text-center text-sm text-neutral-500">
-            The feedback form is switching on — check back shortly.
-          </p>
         ) : (
           <form
             onSubmit={onSubmit}
             className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 md:p-8 space-y-5"
           >
             {/* Honeypot — bots fill this, humans never see it. */}
-            <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+            <input type="text" name="_honey" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
 
             {/* Star rating */}
             <div>
@@ -105,45 +104,51 @@ export default function Feedback() {
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+              <label htmlFor="fb-message" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                 What stood out? Anything we can improve?
               </label>
               <textarea
+                id="fb-message"
                 name="message"
                 rows={4}
-                className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                 placeholder="Print quality, packaging, shipping speed, a request…"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                <label htmlFor="fb-name" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                   Name <span className="text-neutral-600 normal-case tracking-normal">(optional)</span>
                 </label>
                 <input
+                  id="fb-name"
                   name="name"
-                  className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                  autoComplete="name"
+                  className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                <label htmlFor="fb-email" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                   Email <span className="text-neutral-600 normal-case tracking-normal">(if you want a reply)</span>
                 </label>
                 <input
+                  id="fb-email"
                   name="email"
                   type="email"
-                  className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                  autoComplete="email"
+                  className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                 />
               </div>
             </div>
 
-            {state === "error" && <p className="text-sm text-red-400">{error}</p>}
+            {state === "error" && <p role="alert" className="text-sm text-red-400">{error}</p>}
 
             <button
               type="submit"
               disabled={state === "sending"}
-              className="btn-primary w-full text-base disabled:opacity-60"
+              aria-busy={state === "sending"}
+              className="btn-primary w-full justify-center text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {state === "sending" ? "Sending…" : "Send feedback →"}
             </button>

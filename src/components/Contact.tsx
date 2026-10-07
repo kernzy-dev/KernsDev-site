@@ -1,17 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Reveal from "./motion/Reveal";
+import { FORM_ENDPOINT, formSucceeded } from "../lib/forms";
 
 /**
- * Contact — a real, working inquiry form. Posts to Web3Forms (no backend) so
- * messages email Grant directly; his address never ships to the client. Set
- * VITE_WEB3FORMS_KEY (already used by the custom-print form) to activate.
- *
- * Replaces the old dead "Book a call" button (href="#") that just jumped to the
- * top of the page with no way to actually get in touch.
+ * Contact — a real, working inquiry form. Posts to FormSubmit (no backend) so
+ * messages email Grant directly. Replaces the old dead "Book a call" button
+ * (href="#") that just jumped to the top with no way to actually get in touch.
  */
-
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined;
 
 type State = "idle" | "sending" | "ok" | "error";
 
@@ -26,15 +22,20 @@ export default function Contact() {
     setError("");
     try {
       const data = new FormData(form);
-      data.append("access_key", WEB3FORMS_KEY || "");
-      data.append("subject", "New project inquiry — kernsdev.com");
-      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: data });
+      data.append("_subject", "New project inquiry — kernsdev.com");
+      data.append("_template", "table");
+      data.append("_captcha", "false");
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" },
+      });
       const json = await res.json();
-      if (json.success) {
+      if (formSucceeded(json)) {
         setState("ok");
         form.reset();
       } else {
-        setError(json.message || "Something went wrong — please try again.");
+        setError((json as { message?: string }).message || "Something went wrong — please try again.");
         setState("error");
       }
     } catch {
@@ -72,62 +73,65 @@ export default function Contact() {
 
         <Reveal delay={0.3}>
           {state === "ok" ? (
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8">
+            <div role="status" aria-live="polite" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-8">
               <p className="text-emerald-300 font-medium text-lg">Message sent — thanks! 🎉</p>
               <p className="text-sm text-neutral-400 mt-2">
                 I'll get back to you shortly to set up that first call.
               </p>
             </div>
-          ) : !WEB3FORMS_KEY ? (
-            <p className="text-sm text-neutral-500">
-              The contact form is switching on — check back shortly.
-            </p>
           ) : (
             <form onSubmit={onSubmit} className="text-left rounded-2xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8 space-y-4">
+              <input type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                  <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                     Name<span className="text-accent"> *</span>
                   </label>
                   <input
+                    id="contact-name"
                     name="name"
+                    autoComplete="name"
                     required
-                    className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                    className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                  <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                     Email<span className="text-accent"> *</span>
                   </label>
                   <input
+                    id="contact-email"
                     name="email"
                     type="email"
+                    autoComplete="email"
                     required
-                    className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                    className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                   What do you need built?<span className="text-accent"> *</span>
                 </label>
                 <textarea
+                  id="contact-message"
                   name="message"
                   rows={4}
                   required
-                  className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                  className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                   placeholder="A rough description of the problem, the workflow, or the app you have in mind…"
                 />
               </div>
-              {state === "error" && <p className="text-sm text-red-400">{error}</p>}
+              {state === "error" && <p role="alert" className="text-sm text-red-400">{error}</p>}
               <div className="flex items-center justify-between gap-4">
                 <p className="text-xs text-neutral-600">Based in Somerset, KY · Remote-friendly</p>
                 <motion.button
                   type="submit"
                   disabled={state === "sending"}
+                  aria-busy={state === "sending"}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="btn-primary text-base disabled:opacity-60"
+                  className="btn-primary text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {state === "sending" ? "Sending…" : "Send →"}
                 </motion.button>

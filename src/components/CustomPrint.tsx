@@ -113,7 +113,7 @@ export default function CustomPrint() {
               </p>
             </div>
           ) : state === "ok" ? (
-            <div className="text-center py-6">
+            <div role="status" aria-live="polite" className="text-center py-6">
               <p className="text-emerald-300 font-medium text-lg">Got it — thanks! 🎉</p>
               <p className="text-sm text-neutral-400 mt-2">
                 Your file and details are in. I'll review and reply with a quote + lead time.
@@ -122,42 +122,44 @@ export default function CustomPrint() {
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Your name" name="name" required />
-                <Field label="Email" name="email" type="email" required />
+                <Field label="Your name" name="name" required autoComplete="name" />
+                <Field label="Email" name="email" type="email" required autoComplete="email" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select label="Material" name="material" options={["PLA (standard)", "PLA Silk", "PETG (durable)", "ABS / ASA (heat-resistant)", "Not sure — advise me"]} />
                 <Field label="Color(s)" name="color" placeholder="e.g. black, or teal→violet" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Quantity" name="quantity" type="number" placeholder="1" />
+                <Field label="Quantity" name="quantity" type="number" placeholder="1" min={1} />
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                  <label htmlFor="cp-attachment" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                     Model file (STL / 3MF, ≤ {MAX_MB} MB)
                   </label>
                   <input
+                    id="cp-attachment"
                     type="file"
                     name="attachment"
                     accept=".stl,.3mf,.obj"
-                    className="block w-full text-sm text-neutral-400 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-accent file:text-white file:text-sm hover:file:bg-accent-dark"
+                    className="block w-full rounded-md text-sm text-neutral-400 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent/60 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-accent file:text-white file:text-sm file:cursor-pointer hover:file:bg-accent-dark"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                <label htmlFor="cp-notes" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
                   Notes (size, finish, or a share link if your file is large)
                 </label>
                 <textarea
+                  id="cp-notes"
                   name="notes"
                   rows={3}
-                  className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+                  className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                   placeholder="Scale it to ~120 mm tall; matte finish; Drive/WeTransfer link if the file's too big…"
                 />
               </div>
 
-              {state === "error" && <p className="text-sm text-red-400">{error}</p>}
+              {state === "error" && <p role="alert" className="text-sm text-red-400">{error}</p>}
 
-              <div className="flex items-center justify-between gap-4 pt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
                 <p className="text-[11px] text-neutral-600 leading-snug max-w-sm">
                   By submitting you confirm you own or have the rights to print this model. I print
                   customer-supplied files; I don't sell licensed characters.
@@ -165,7 +167,8 @@ export default function CustomPrint() {
                 <button
                   type="submit"
                   disabled={state === "sending"}
-                  className="btn-primary text-sm whitespace-nowrap disabled:opacity-60"
+                  aria-busy={state === "sending"}
+                  className="btn-primary text-sm whitespace-nowrap w-full sm:w-auto justify-center outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {state === "sending" ? "Sending…" : "Send for a quote →"}
                 </button>
@@ -184,37 +187,47 @@ function Field({
   type = "text",
   required,
   placeholder,
+  autoComplete,
+  min,
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
   placeholder?: string;
+  autoComplete?: string;
+  min?: number;
 }) {
+  const id = `cp-${name}`;
   return (
     <div>
-      <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
         {label}
         {required && <span className="text-accent"> *</span>}
       </label>
       <input
+        id={id}
         type={type}
         name={name}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+        autoComplete={autoComplete}
+        min={min}
+        className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
       />
     </div>
   );
 }
 
 function Select({ label, name, options }: { label: string; name: string; options: string[] }) {
+  const id = `cp-${name}`;
   return (
     <div>
-      <label className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">{label}</label>
+      <label htmlFor={id} className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">{label}</label>
       <select
+        id={id}
         name={name}
-        className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 focus:border-accent outline-none"
+        className="w-full rounded-md bg-neutral-900 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
       >
         {options.map((o) => (
           <option key={o} value={o}>

@@ -21,11 +21,11 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
       <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
         <div className="container-tight flex items-center justify-between h-16">
-          <a href="/" className="flex items-center gap-2 font-display font-bold text-lg">
-            <span className="bg-accent text-white w-8 h-8 rounded-md grid place-items-center">K</span>
+          <a href="/" aria-label="KernsDev home" className="flex items-center gap-2 font-display font-bold text-lg rounded outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
+            <span aria-hidden="true" className="bg-accent text-white w-8 h-8 rounded-md grid place-items-center">K</span>
             <span>KernsDev</span>
           </a>
-          <a href="/" className="text-sm text-neutral-300 hover:text-white transition-colors">
+          <a href="/" className="text-sm text-neutral-300 hover:text-white transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
             ← Back to site
           </a>
         </div>
@@ -45,8 +45,8 @@ export default function ServicesPage() {
             here's what I do and roughly what it costs.
           </p>
           <div className="mt-6 flex gap-4 flex-wrap">
-            <a href="/#contact" className="btn-primary">Book a call →</a>
-            <a href="/" className="text-sm text-neutral-400 hover:text-white transition-colors self-center">
+            <a href="/#contact" className="btn-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">Book a call →</a>
+            <a href="/" className="text-sm text-neutral-400 hover:text-white transition-colors self-center rounded outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
               See the work →
             </a>
           </div>
@@ -74,7 +74,7 @@ export default function ServicesPage() {
               <Weighted tilt={3} lift={10} className="h-full">
                 <article className="group relative bg-gradient-to-br from-neutral-900/60 to-neutral-900/20 border border-neutral-800 hover:border-accent/40 rounded-2xl p-6 transition-colors h-full flex flex-col">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="text-3xl text-accent group-hover:scale-110 transition-transform origin-left">
+                    <div aria-hidden="true" className="text-3xl text-accent group-hover:scale-110 transition-transform origin-left">
                       {s.icon}
                     </div>
                     {s.tag && (
@@ -112,7 +112,7 @@ export default function ServicesPage() {
               is the fix, and what it'd take. Most projects scope in a call or two.
             </p>
             <div className="mt-6">
-              <a href="/#contact" className="btn-primary">Start the conversation →</a>
+              <a href="/#contact" className="btn-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">Start the conversation →</a>
             </div>
           </div>
         </Reveal>

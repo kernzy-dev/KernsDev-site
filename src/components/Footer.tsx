@@ -10,10 +10,10 @@ export default function Footer() {
           <span>© {year} KernsDev · Grant Kerns · Somerset, KY</span>
         </div>
         <div className="flex gap-6">
-          <a href="#work" className="hover:text-neutral-300">Work</a>
-          <a href="#products" className="hover:text-neutral-300">Products</a>
-          <a href="#services" className="hover:text-neutral-300">Services</a>
-          <a href="#contact" className="hover:text-neutral-300">Contact</a>
+          <a href="#work" className="hover:text-neutral-300 transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent">Work</a>
+          <a href="#products" className="hover:text-neutral-300 transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent">Products</a>
+          <a href="#services" className="hover:text-neutral-300 transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent">Services</a>
+          <a href="#contact" className="hover:text-neutral-300 transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent">Contact</a>
         </div>
       </div>
     </footer>

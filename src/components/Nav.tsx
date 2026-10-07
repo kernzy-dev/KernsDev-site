@@ -51,7 +51,8 @@ export default function Nav() {
         <a
           href="#top"
           onClick={() => setOpen(false)}
-          className="flex items-center gap-2.5 text-lg"
+          aria-label="KernsDev — back to top"
+          className="flex items-center gap-2.5 text-lg rounded outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <LogoMark />
           <span className="font-mono font-semibold tracking-tight">
@@ -63,7 +64,10 @@ export default function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-300">
           {LINKS.map((l) => (
             <Magnetic key={l.href} radius={48} strength={0.4}>
-              <a href={l.href} className="hover:text-white transition-colors">
+              <a
+                href={l.href}
+                className="hover:text-white transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
                 {l.label}
               </a>
             </Magnetic>
@@ -71,7 +75,7 @@ export default function Nav() {
           <Magnetic radius={70} strength={0.3}>
             <a
               href="#contact"
-              className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md font-medium transition-colors inline-block"
+              className="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md font-medium transition-colors inline-block outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
             >
               Book a call
             </a>
@@ -112,7 +116,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-3 text-base text-neutral-200 hover:text-accent border-b border-neutral-900 transition-colors"
+                className="py-3 text-base text-neutral-200 hover:text-accent border-b border-neutral-900 transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {l.label}
               </a>
@@ -120,7 +124,7 @@ export default function Nav() {
             <a
               href="#contact"
               onClick={() => setOpen(false)}
-              className="mt-4 mb-1 bg-accent hover:bg-accent-dark text-white text-center px-4 py-3 rounded-md font-medium transition-colors"
+              className="mt-4 mb-1 bg-accent hover:bg-accent-dark text-white text-center px-4 py-3 rounded-md font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
             >
               Book a call
             </a>

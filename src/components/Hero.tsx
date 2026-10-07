@@ -170,12 +170,12 @@ export default function Hero() {
             <p className="text-[11px] uppercase tracking-[0.2em] text-neutral-500 mb-3">
               What every build gets
             </p>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
                 aria-label="Previous value"
                 onClick={() => step(-1)}
-                className="grid place-items-center h-8 w-8 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-accent/60 transition-colors"
+                className="grid place-items-center h-8 w-8 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-accent/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 ‹
               </button>
@@ -189,7 +189,7 @@ export default function Hero() {
                   onBlur={() => setHovered(null)}
                   onClick={() => setPinned(pinned === key ? null : key)}
                   aria-pressed={active === key}
-                  className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${
+                  className={`px-4 py-1.5 rounded-full text-sm border transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     active === key
                       ? "bg-accent text-white border-accent"
                       : "bg-neutral-900/50 text-neutral-300 border-neutral-700 hover:border-neutral-500"
@@ -202,13 +202,14 @@ export default function Hero() {
                 type="button"
                 aria-label="Next value"
                 onClick={() => step(1)}
-                className="grid place-items-center h-8 w-8 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-accent/60 transition-colors"
+                className="grid place-items-center h-8 w-8 rounded-full border border-neutral-700 text-neutral-400 hover:text-white hover:border-accent/60 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 ›
               </button>
             </div>
-            {/* caption — fixed height so the layout doesn't jump */}
-            <div className="h-12 mt-4">
+            {/* caption — reserve height so the layout doesn't jump; grows if the
+                blurb wraps on narrow screens rather than clipping. */}
+            <div className="min-h-[3rem] mt-4">
               <AnimatePresence mode="wait">
                 {active && (
                   <motion.p

@@ -20,7 +20,11 @@ export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
 
 export default function Logo({ href = "/" }: { href?: string }) {
   return (
-    <a href={href} className="flex items-center gap-2.5 text-lg">
+    <a
+      href={href}
+      aria-label="KernsDev — home"
+      className="flex items-center gap-2.5 text-lg rounded outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
       <LogoMark />
       <span className="font-mono font-semibold tracking-tight">
         kerns<span className="text-accent">dev</span>

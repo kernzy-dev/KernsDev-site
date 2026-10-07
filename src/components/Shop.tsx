@@ -223,7 +223,7 @@ export default function Shop() {
                   className="w-full bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600"
                 />
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <label className="flex items-center gap-2 text-xs text-neutral-400 select-none cursor-pointer whitespace-nowrap">
                   <input
                     type="checkbox"
@@ -237,7 +237,7 @@ export default function Shop() {
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
                   aria-label="Filter by material"
-                  className="bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
+                  className="flex-1 md:flex-none min-w-0 bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
                 >
                   <option value="All">All materials</option>
                   {materials.map((m) => (
@@ -248,7 +248,7 @@ export default function Shop() {
                   value={sort}
                   onChange={(e) => setSort(e.target.value as SortKey)}
                   aria-label="Sort prints"
-                  className="bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
+                  className="flex-1 md:flex-none min-w-0 bg-neutral-950/60 border border-neutral-800 focus:border-accent/60 focus:outline-none rounded-lg px-3 py-2 text-sm text-neutral-200"
                 >
                   <option value="featured">Featured</option>
                   <option value="price-asc">Price: low to high</option>
@@ -266,7 +266,7 @@ export default function Shop() {
                   type="button"
                   onClick={() => setCategory(c)}
                   aria-pressed={category === c}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                     category === c
                       ? "bg-accent text-white border-accent"
                       : "bg-neutral-950/40 text-neutral-400 border-neutral-800 hover:border-neutral-600"
@@ -289,7 +289,7 @@ export default function Shop() {
             <button
               type="button"
               onClick={resetFilters}
-              className="text-accent hover:underline"
+              className="text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded"
             >
               Clear filters
             </button>
@@ -311,12 +311,13 @@ export default function Shop() {
 
         {results.length === 0 && (
           <Reveal delay={0.1}>
-            <div className="mt-10 text-center">
-              <p className="text-neutral-400">No prints match your search.</p>
+            <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-900/40 px-6 py-12 text-center">
+              <p className="text-neutral-300 font-medium">No prints match these filters</p>
+              <p className="mt-1 text-sm text-neutral-500">Try a different category or material, or clear your filters to see everything.</p>
               <button
                 type="button"
                 onClick={resetFilters}
-                className="mt-3 text-sm text-accent hover:underline"
+                className="mt-4 text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded"
               >
                 Clear filters
               </button>
@@ -409,8 +410,8 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
             <button
               type="button"
               onClick={onView}
-              aria-label={`View ${p.name} in 3D`}
-              className="absolute inset-0 z-20 cursor-grab"
+              aria-label={`View ${p.name} in an interactive 360° preview`}
+              className="absolute inset-0 z-20 cursor-grab focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/70"
             />
             <span className="absolute top-3 right-3 z-30 flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider bg-neutral-950/70 text-neutral-100 px-2 py-1 rounded-full border border-neutral-700 group-hover:border-accent/60 group-hover:text-white transition-colors pointer-events-none">
               <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
@@ -468,18 +469,18 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
               <div className="flex items-center border border-neutral-800 rounded-md overflow-hidden">
                 <button
                   type="button"
-                  aria-label="Fewer"
+                  aria-label="Decrease quantity"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors"
+                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60"
                 >
                   −
                 </button>
-                <span className="px-4 py-1.5 text-sm tabular-nums min-w-[2.5rem] text-center text-neutral-100">{qty}</span>
+                <span aria-live="polite" className="px-4 py-1.5 text-sm tabular-nums min-w-[2.5rem] text-center text-neutral-100">{qty}</span>
                 <button
                   type="button"
-                  aria-label="More"
+                  aria-label="Increase quantity"
                   onClick={() => setQty((q) => Math.min(99, q + 1))}
-                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors"
+                  className="px-3 py-1.5 text-neutral-300 hover:bg-neutral-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60"
                 >
                   +
                 </button>
@@ -492,7 +493,8 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
                   type="button"
                   onClick={() => setQty(n)}
                   aria-pressed={qty === n}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  aria-label={n === 1 ? "Single" : `${n}-pack`}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                     qty === n
                       ? "bg-accent text-white border-accent"
                       : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
@@ -516,8 +518,9 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
                 type="button"
                 onClick={() => setSize(s)}
                 aria-pressed={size.key === s.key}
+                aria-label={`${s.name} — ${s.dims}`}
                 title={`${s.name} — ${s.dims}`}
-                className={`flex-1 text-xs font-medium py-1.5 rounded-md border transition-colors ${
+                className={`flex-1 text-xs font-medium py-1.5 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
                   size.key === s.key
                     ? "bg-accent text-white border-accent"
                     : "bg-neutral-900/50 text-neutral-400 border-neutral-800 hover:border-neutral-600"
@@ -541,12 +544,15 @@ function PrintCard({ print: p, onView }: { print: Print; onView?: () => void }) 
               href={safeHref(activeLink)}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary text-sm w-full text-center"
+              className="btn-primary justify-center text-sm w-full text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
             >
               {pack ? `Buy ${qty} — ${priceLabel}` : multiSize ? `Buy ${size.name} — ${size.price}` : `Buy — ${size.price}`}
             </a>
           ) : (
-            <span className="inline-flex w-full justify-center text-sm border border-neutral-800 text-neutral-500 px-4 py-2 rounded-md cursor-not-allowed">
+            <span
+              aria-disabled="true"
+              className="inline-flex w-full justify-center text-sm border border-neutral-800 bg-neutral-900/30 text-neutral-500 px-4 py-2 rounded-md cursor-not-allowed"
+            >
               {p.soldOut ? "Sold out" : pack ? "Coming soon" : `${size.name} — coming soon`}
             </span>
           )}

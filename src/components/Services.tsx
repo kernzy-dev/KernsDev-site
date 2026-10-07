@@ -26,7 +26,7 @@ export default function Services() {
             <Reveal key={s.name} delay={i * 0.05}>
               <div className="group relative bg-neutral-900/30 border border-neutral-800 hover:border-accent/40 rounded-xl p-5 transition-all hover:-translate-y-1 h-full">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="text-3xl text-accent group-hover:scale-110 transition-transform origin-left">
+                  <div aria-hidden="true" className="text-3xl text-accent group-hover:scale-110 transition-transform origin-left">
                     {s.icon}
                   </div>
                   {s.tag && (
@@ -49,11 +49,11 @@ export default function Services() {
 
         <Reveal delay={0.3}>
           <div className="mt-10 flex items-center justify-center gap-6 flex-wrap">
-            <a href="#contact" className="btn-primary">
+            <a href="#contact" className="btn-primary outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950">
               Discuss a project →
             </a>
-            <a href="/services" className="text-sm text-neutral-400 hover:text-white transition-colors">
-              See full services & detail →
+            <a href="/services" className="text-sm text-neutral-400 hover:text-white transition-colors rounded outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
+              See full services &amp; detail →
             </a>
           </div>
         </Reveal>
