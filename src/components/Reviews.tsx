@@ -23,10 +23,12 @@ import { fetchApprovedReviews, SAMPLE_REVIEWS, type Review } from "../lib/review
  */
 
 // ---- tuning -----------------------------------------------------------------
-const MAX_BUBBLES_DESKTOP = 14;
-const MAX_BUBBLES_MOBILE = 6;
-const SPEED_DESKTOP = 0.16; // px per ms-ish (scaled by frame delta)
-const SPEED_MOBILE = 0.1;
+// Smaller, more numerous bubbles → an ambient particle field rather than a set
+// of cards. Caps stay modest so the single rAF loop stays cheap.
+const MAX_BUBBLES_DESKTOP = 22;
+const MAX_BUBBLES_MOBILE = 10;
+const SPEED_DESKTOP = 0.17; // px per ms-ish (scaled by frame delta)
+const SPEED_MOBILE = 0.11;
 
 function useIsMobile(): boolean {
   const [mobile, setMobile] = useState(false);
@@ -121,7 +123,7 @@ export default function Reviews() {
   );
 
   return (
-    <section id="reviews" className="py-20 md:py-28 border-t border-neutral-900">
+    <section id="reviews" className="relative py-20 md:py-28 border-t border-neutral-900 overflow-hidden">
       <div className="container-tight">
         <Reveal>
           <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
@@ -143,17 +145,24 @@ export default function Reviews() {
         {usingSamples && (
           <div
             role="note"
-            className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-amber-300"
+            className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-amber-300"
           >
             ⚠ Dev preview — sample reviews (not real), hidden in production
           </div>
         )}
+      </div>
 
-        {reviews === null ? (
+      {/* Animated field is full-bleed (ambient), the boxed states stay contained. */}
+      {reviews === null ? (
+        <div className="container-tight mt-6">
           <FieldSkeleton />
-        ) : shown.length === 0 ? (
+        </div>
+      ) : shown.length === 0 ? (
+        <div className="container-tight mt-6">
           <EmptyState />
-        ) : reduced ? (
+        </div>
+      ) : reduced ? (
+        <div className="container-tight mt-8">
           <StaticGrid
             reviews={shown}
             sample={usingSamples}
@@ -162,7 +171,9 @@ export default function Reviews() {
               setExpandedId(id);
             }}
           />
-        ) : (
+        </div>
+      ) : (
+        <div className="mt-2 w-full px-2 sm:px-4">
           <BubbleField
             reviews={shown}
             isMobile={isMobile}
@@ -171,8 +182,8 @@ export default function Reviews() {
               setExpandedId(id);
             }}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {expanded && (
@@ -291,15 +302,15 @@ function BubbleField({
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden rounded-2xl border border-neutral-900 bg-gradient-to-b from-neutral-900/30 to-neutral-950/10 h-[62vh] min-h-[420px] max-h-[720px]"
+      className="relative w-full overflow-hidden h-[80vh] min-h-[520px] max-h-[880px]"
     >
-      {/* soft accent glow backdrop */}
+      {/* soft ambient accent glow — no border/box, the field blends into the page */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-60"
+        className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           background:
-            "radial-gradient(60% 50% at 30% 30%, rgba(168,85,247,0.10), transparent 70%), radial-gradient(50% 50% at 75% 70%, rgba(168,85,247,0.08), transparent 70%)",
+            "radial-gradient(45% 40% at 22% 28%, rgba(168,85,247,0.09), transparent 72%), radial-gradient(40% 45% at 80% 68%, rgba(168,85,247,0.07), transparent 72%), radial-gradient(35% 30% at 55% 85%, rgba(168,85,247,0.05), transparent 72%)",
         }}
       />
       {reviews.map((r) => (
@@ -326,13 +337,10 @@ function BubbleField({
             willChange: "transform",
           }}
         >
-          <span className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-full border border-accent/25 bg-neutral-900/70 p-3 text-center shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:border-accent/70 group-hover:bg-neutral-900/90">
-            <Stars rating={r.rating} className="text-[10px] leading-none tracking-tight" />
-            <span className="line-clamp-3 text-[11px] leading-snug text-neutral-200">
-              {snippet(r.text, 70)}
-            </span>
-            <span className="mt-0.5 truncate max-w-full text-[9px] uppercase tracking-wider text-neutral-500">
-              {r.name}
+          <span className="flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border border-accent/20 bg-neutral-900/55 px-2 py-1.5 text-center shadow-[0_6px_22px_rgba(0,0,0,0.4)] backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-accent/70 group-hover:bg-neutral-900/90">
+            <Stars rating={r.rating} className="text-[8px] leading-none tracking-tighter" />
+            <span className="line-clamp-2 text-[9px] leading-[1.15] text-neutral-300">
+              {snippet(r.text, 26)}
             </span>
           </span>
         </button>
@@ -341,13 +349,14 @@ function BubbleField({
   );
 }
 
-// Deterministic bubble pixel size: a base that varies a little with the rating
-// plus a stable per-id jitter. Used for BOTH the physics bounds and the rendered
-// element so edge-bounce lines up exactly.
+// Deterministic bubble pixel size: a small base that varies a little with the
+// rating plus a stable per-id jitter. Kept small so the field reads as drifting
+// particles. Used for BOTH the physics bounds and the rendered element so
+// edge-bounce lines up exactly.
 function computeBubbleSize(r: Review, isMobile: boolean): number {
-  const base = isMobile ? 84 : 104;
-  const ratingBoost = (Math.max(1, Math.min(5, r.rating)) - 3) * (isMobile ? 5 : 9);
-  const jitter = ((hashStr(r.id) % 1000) / 1000) * (isMobile ? 26 : 46);
+  const base = isMobile ? 46 : 58;
+  const ratingBoost = (Math.max(1, Math.min(5, r.rating)) - 3) * (isMobile ? 3 : 5);
+  const jitter = ((hashStr(r.id) % 1000) / 1000) * (isMobile ? 22 : 36);
   return Math.round(base + ratingBoost + jitter);
 }
 
@@ -507,7 +516,7 @@ function EmptyState() {
 function FieldSkeleton() {
   return (
     <div
-      className="flex h-[62vh] min-h-[420px] max-h-[720px] items-center justify-center rounded-2xl border border-neutral-900 bg-neutral-900/20"
+      className="flex h-[80vh] min-h-[520px] max-h-[880px] items-center justify-center rounded-2xl border border-neutral-900 bg-neutral-900/20"
       aria-hidden="true"
     >
       <div className="font-mono text-xs uppercase tracking-[0.25em] text-neutral-600">

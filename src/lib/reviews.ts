@@ -46,4 +46,10 @@ export const SAMPLE_REVIEWS: Review[] = [
   { id: "sample-6", rating: 4, name: "Sample · Theo", text: "Great print, tiny bit of stringing on the sled but nothing a quick trim didn't fix. Still thrilled with it.", date: "2026-09-08T12:40:00.000Z" },
   { id: "sample-7", rating: 5, name: "Sample · Ava M.", text: "Reached out about a bulk order and got a thoughtful reply within the hour. The nordic ornaments are beautiful.", date: "2026-09-03T16:20:00.000Z" },
   { id: "sample-8", rating: 5, name: "Sample · Sam P.", text: "Exactly what I wanted — clean, sturdy, and the purple accent color matched perfectly.", date: "2026-08-29T08:10:00.000Z" },
+  { id: "sample-9", rating: 5, name: "Sample · Noah B.", text: "Ordered a batch of ornaments for gifts — every one flawless. Will be back next year.", date: "2026-08-24T11:00:00.000Z" },
+  { id: "sample-10", rating: 4, name: "Sample · Grace", text: "Really happy with the coaster set. Took a couple days longer than hoped but worth the wait.", date: "2026-08-20T13:25:00.000Z" },
+  { id: "sample-11", rating: 5, name: "Sample · Eli R.", text: "The detail on the nutcracker is unreal for a 3D print. Friends keep asking where I got it.", date: "2026-08-15T19:30:00.000Z" },
+  { id: "sample-12", rating: 5, name: "Sample · Mia", text: "Smooth process start to finish and the finish quality is genuinely premium.", date: "2026-08-11T07:50:00.000Z" },
+  { id: "sample-13", rating: 5, name: "Sample · Owen T.", text: "Custom logo keychain came out perfect. Fast turnaround, great communication.", date: "2026-08-06T15:05:00.000Z" },
+  { id: "sample-14", rating: 4, name: "Sample · Harper", text: "Cute little sled, nicely packed. One tiny blemish but honestly barely noticeable.", date: "2026-08-02T09:40:00.000Z" },
 ];
