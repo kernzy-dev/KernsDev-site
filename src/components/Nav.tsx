@@ -8,6 +8,7 @@ const LINKS = [
   { href: "#products", label: "Products" },
   { href: "/3dprintshop", label: "Prints" },
   { href: "#services", label: "Services" },
+  { href: "/feedback", label: "Feedback" },
 ];
 
 export default function Nav() {
