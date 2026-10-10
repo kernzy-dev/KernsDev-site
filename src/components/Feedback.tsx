@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FORM_ENDPOINT, formSucceeded } from "../lib/forms";
+import { FORM_ENDPOINT, formSucceeded, submitReview } from "../lib/forms";
 
 /**
  * Feedback — a standalone, deep-linkable page (route: /feedback) meant to be the
@@ -31,6 +31,21 @@ export default function Feedback() {
       data.append("_template", "table");
       data.append("_captcha", "false");
       data.append("rating", rating ? `${rating} / 5` : "not rated");
+
+      // Also store the review in the KV-backed reviews feed (pending approval).
+      // Best-effort and independent: if this fails the email still sends, and
+      // if the email fails this still runs — the two paths don't block each
+      // other. Only fire when there's an actual rating + comment to show.
+      const reviewText = String(data.get("message") || "").trim();
+      if (rating >= 1 && reviewText.length >= 2) {
+        void submitReview({
+          rating,
+          name: String(data.get("name") || "").trim(),
+          text: reviewText,
+          hp: String(data.get("_honey") || ""),
+        });
+      }
+
       const res = await fetch(FORM_ENDPOINT, {
         method: "POST",
         body: data,

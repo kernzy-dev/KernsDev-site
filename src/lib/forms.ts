@@ -15,3 +15,35 @@ export function formSucceeded(json: unknown): boolean {
   const s = (json as { success?: unknown })?.success;
   return s === true || s === "true";
 }
+
+// ---------------------------------------------------------------------------
+// Customer reviews — same-origin Cloudflare Pages Function backed by KV.
+// Submitting a review stores it as PENDING (unapproved); it only appears on the
+// site once Grant approves it. This runs ALONGSIDE the FormSubmit email so a
+// failure of one path never breaks the other.
+export const REVIEWS_SUBMIT_ENDPOINT = "/api/reviews/submit";
+
+/**
+ * Fire a review at the KV-backed store. Resolves true on success, false on any
+ * failure (never throws) — callers should treat it as best-effort so the email
+ * path stays authoritative for the UI's success state.
+ */
+export async function submitReview(review: {
+  rating: number;
+  name?: string;
+  text: string;
+  hp?: string; // honeypot passthrough
+}): Promise<boolean> {
+  try {
+    const res = await fetch(REVIEWS_SUBMIT_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(review),
+    });
+    if (!res.ok) return false;
+    const json = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+    return json?.ok === true;
+  } catch {
+    return false;
+  }
+}

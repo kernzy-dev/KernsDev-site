@@ -38,3 +38,7 @@ Thumbs.db
 # Resale cross-posting module — LOCAL ONLY (browser sessions, automation, cookies).
 # Never commit or deploy. Not part of the public site.
 /resale-sync/
+
+# Local dev/preview artifacts (reviews feature screenshots, wrangler state).
+/.preview/
+/.wrangler/

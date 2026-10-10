@@ -12,6 +12,7 @@ import CursorTrail from "./components/motion/CursorTrail";
 const About = lazy(() => import("./components/About"));
 const FeaturedWork = lazy(() => import("./components/FeaturedWork"));
 const Products = lazy(() => import("./components/Products"));
+const Reviews = lazy(() => import("./components/Reviews"));
 const Services = lazy(() => import("./components/Services"));
 const Contact = lazy(() => import("./components/Contact"));
 const Footer = lazy(() => import("./components/Footer"));
@@ -107,6 +108,7 @@ export default function App() {
           <About />
           <FeaturedWork />
           <Products />
+          <Reviews />
           <Contact />
         </Suspense>
       </main>
