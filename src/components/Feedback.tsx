@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { FORM_ENDPOINT, formSucceeded, submitReview } from "../lib/forms";
+import { submitReview } from "../lib/forms";
+
+const MAX_PHOTO_MB = 12;
 
 /**
  * Feedback — a standalone, deep-linkable page (route: /feedback) meant to be the
@@ -19,6 +21,7 @@ export default function Feedback() {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [error, setError] = useState("");
+  const [photoCount, setPhotoCount] = useState(0);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,19 +30,13 @@ export default function Feedback() {
     setError("");
     try {
       const data = new FormData(form);
-      // Per-order feedback: the printed sticker's QR carries ?o=<orderid>, so tag
-      // the submission with it — each review then ties back to a specific order.
+      // Per-order feedback: the printed sticker's QR carries ?o=<orderid>, so the
+      // submission ties back to a specific transaction.
       const order = new URLSearchParams(window.location.search).get("o") || "";
       if (order) data.append("order", order);
-      data.append("_subject", order ? `New shop feedback — order ${order}` : "New shop feedback — kernsdev.com");
-      data.append("_template", "table");
-      data.append("_captcha", "false");
       data.append("rating", rating ? `${rating} / 5` : "not rated");
 
-      // Also store the review in the KV-backed reviews feed (pending approval).
-      // Best-effort and independent: if this fails the email still sends, and
-      // if the email fails this still runs — the two paths don't block each
-      // other. Only fire when there's an actual rating + comment to show.
+      // Public reviews feed (KV) — best-effort, independent of the order-linked path.
       const reviewText = String(data.get("message") || "").trim();
       if (rating >= 1 && reviewText.length >= 2) {
         void submitReview({
@@ -50,18 +47,16 @@ export default function Feedback() {
         });
       }
 
-      const res = await fetch(FORM_ENDPOINT, {
-        method: "POST",
-        body: data,
-        headers: { Accept: "application/json" },
-      });
-      const json = await res.json();
-      if (formSucceeded(json)) {
+      // Order-linked intake: any photos -> Google Drive, the review logged on the
+      // order, Grant emailed. The /api/feedback function brokers it with the
+      // shop-ops key held server-side (never exposed on this public page).
+      const res = await fetch("/api/feedback", { method: "POST", body: data });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (res.ok && json.ok !== false) {
         setState("ok");
-        // Completed → return to the home page.
         window.setTimeout(() => { window.location.href = RETURN_TO; }, RETURN_DELAY);
       } else {
-        setError((json as { message?: string }).message || "Something went wrong — please try again.");
+        setError(json.error || "Something went wrong — please try again.");
         setState("error");
       }
     } catch {
@@ -133,6 +128,38 @@ export default function Feedback() {
                 className="w-full rounded-md bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 outline-none transition-colors focus:border-accent focus-visible:ring-2 focus-visible:ring-accent/60"
                 placeholder="Print quality, packaging, shipping speed, a request…"
               />
+            </div>
+
+            {/* Optional photo upload — lands in Drive against this order */}
+            <div>
+              <label htmlFor="fb-photos" className="block text-xs uppercase tracking-wider text-neutral-500 mb-1.5">
+                Add photos <span className="text-neutral-600 normal-case tracking-normal">(optional — show off the print!)</span>
+              </label>
+              <input
+                id="fb-photos"
+                name="photo"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  const fs = Array.from(e.target.files || []);
+                  const tooBig = fs.find((f) => f.size > MAX_PHOTO_MB * 1024 * 1024);
+                  if (tooBig) {
+                    setError(`"${tooBig.name}" is over ${MAX_PHOTO_MB} MB — pick a smaller photo.`);
+                    e.target.value = "";
+                    setPhotoCount(0);
+                    return;
+                  }
+                  setError("");
+                  setPhotoCount(fs.length);
+                }}
+                className="block w-full text-sm text-neutral-400 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-800 file:px-3 file:py-2 file:text-neutral-100 hover:file:bg-neutral-700 file:cursor-pointer"
+              />
+              {photoCount > 0 && (
+                <p className="mt-1 text-xs text-accent">
+                  {photoCount} photo{photoCount > 1 ? "s" : ""} attached
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
