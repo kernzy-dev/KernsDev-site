@@ -27,7 +27,11 @@ export default function Feedback() {
     setError("");
     try {
       const data = new FormData(form);
-      data.append("_subject", "New shop feedback — kernsdev.com");
+      // Per-order feedback: the printed sticker's QR carries ?o=<orderid>, so tag
+      // the submission with it — each review then ties back to a specific order.
+      const order = new URLSearchParams(window.location.search).get("o") || "";
+      if (order) data.append("order", order);
+      data.append("_subject", order ? `New shop feedback — order ${order}` : "New shop feedback — kernsdev.com");
       data.append("_template", "table");
       data.append("_captcha", "false");
       data.append("rating", rating ? `${rating} / 5` : "not rated");
